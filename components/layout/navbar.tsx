@@ -3,61 +3,16 @@ import React, { useState } from 'react';
 import { FiSearch, FiBell, FiMoon, FiSun, FiSettings, FiFileText, FiClock } from "react-icons/fi";
 
 export const Navbar = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotifyOpen, setIsNotifyOpen] = useState(false);
 
   return (
-    <header className="h-[70px] bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-[100]">
-      
-      {/* Search Bar Section */}
-      <div className="relative w-96">
-        <div className="relative group">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" />
-          <input 
-            type="text" 
-            onFocus={() => setIsSearchOpen(true)}
-            onBlur={() => setTimeout(() => setIsSearchOpen(false), 200)}
-            placeholder="Search..." 
-            className="w-full bg-gray-50 border border-transparent rounded-lg py-2 pl-10 pr-4 focus:bg-white focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5 outline-none text-sm transition-all"
-          />
-        </div>
-
-        {/* --- Search Dropdown --- */}
-        {isSearchOpen && (
-          <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="p-4 border-b border-gray-50">
-               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Recent Search</span>
-               <div className="flex gap-2 mt-2">
-                  {['Grunt', 'Node JS', 'SCSS'].map(tag => (
-                    <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 text-[11px] rounded-md font-medium">{tag}</span>
-                  ))}
-               </div>
-            </div>
-            <div className="p-2">
-               <span className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Help</span>
-               <div className="mt-1">
-                  <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer group">
-                     <div className="p-2 bg-blue-50 text-blue-500 rounded-lg"><FiSettings size={14}/></div>
-                     <span className="text-sm text-gray-700 group-hover:text-emerald-600">How to setup theme?</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer group">
-                     <div className="p-2 bg-orange-50 text-orange-500 rounded-lg"><FiFileText size={14}/></div>
-                     <span className="text-sm text-gray-700 group-hover:text-emerald-600">View detail documentation</span>
-                  </div>
-               </div>
-            </div>
-            <div className="p-3 bg-gray-50 text-center">
-               <button className="text-xs font-bold text-emerald-600 hover:underline">Search all</button>
-            </div>
-          </div>
-        )}
-      </div>
+    <header className="h-[70px] bg-white border-b border-gray-200 flex items-center justify-end px-8 sticky top-0 z-[100]">
 
       {/* Right Icons */}
       <div className="flex items-center gap-5">
         <button className="text-gray-500 hover:text-emerald-500 transition-colors"><FiMoon size={20} /></button>
         
-        {/* --- Notification Bell & Dropdown (Screenshot 920 style) --- */}
+        {/* --- Notification Bell & Dropdown --- */}
         <div className="relative">
           <button 
             onClick={() => setIsNotifyOpen(!isNotifyOpen)}
