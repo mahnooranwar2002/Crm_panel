@@ -1,12 +1,21 @@
 @import "tailwindcss";
 
-:root {
-  /* Jampack wala light grayish-blue background */
-  --background: #f4f7fa; 
-  --foreground: #1e293b;
+@theme {
+  /* Yahan aap apne CSS variables ko Tailwind classes ke sath link kar rahe hain */
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  
+  /* Agar background aur foreground bhi map karne hain */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
-/* Yahan se dark mode wala media query khatam kar dia hai */
+:root {
+  --background: #f4f7fa;
+  --foreground: #1e293b;
+  --primary: #1E90FF;
+  --secondary: #00bfff;
+}
 
 body {
   background: var(--background);

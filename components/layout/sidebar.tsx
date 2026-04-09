@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaUsers } from "react-icons/fa6";
 import { useSidebar } from "@/hooks/use-sidebar"; 
+import { HiUserGroup } from "react-icons/hi2";
 
 const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
@@ -15,9 +16,10 @@ export const Sidebar = () => {
   const { isCollapsed, toggle } = useSidebar();
 
   const menuItems = [
-    { icon: FiHome, label: "Dashboard", href: "/" }, // Dashboard path
+    { icon: FiHome, label: "Dashboard", href: "/home" }, // Dashboard path
     { icon: FaUsers, label: "User Management", href: "/user" }, // Correct path
     { icon: MdManageAccounts, label: "Leads Management", href: "/leads" }, 
+    { icon: HiUserGroup, label: "Roles Management", href: "/roles" },
     { icon: PiTrendUpDuotone, label: "Opportunities", href: "/opportunities" },
   ];
 

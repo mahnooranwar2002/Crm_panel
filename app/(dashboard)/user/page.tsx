@@ -1,5 +1,5 @@
 import React from 'react'
-import { UserTable } from '@/components/UserTable'
+import { UserTable } from '@/components/ui/UserTable'
 
 const UserManagementPage = () => {
   return (
