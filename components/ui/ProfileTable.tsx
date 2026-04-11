@@ -1,9 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-// FiX aur FiLink add kiye gaye hain
 import { FiEdit2, FiUser, FiX, FiLink } from 'react-icons/fi';
 
-// Initial dummy data
 const initialData = {
     id: 1,
     name: "John Doe",
@@ -21,7 +19,7 @@ export const ProfileTable = () => {
 
     const updateUser = (e: React.FormEvent) => {
         e.preventDefault();
-        setUserData(editingUser); // Main state update ho rahi hai
+        setUserData(editingUser);
         setEditingUser(null);
     };
 
@@ -30,11 +28,9 @@ export const ProfileTable = () => {
             
             {/* --- 1. Top Profile Header Card --- */}
             <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                
                 <div className="flex items-center gap-4">
                     <div className="relative group">
                         <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md bg-primary flex-shrink-0 flex items-center justify-center text-white text-2xl font-bold">
-                            {/* Name ke initials display honge */}
                             {userData.name.split(' ').map(n => n[0]).join('')}
                         </div>
                     </div>
@@ -48,7 +44,7 @@ export const ProfileTable = () => {
 
                 <div className="flex items-center gap-3">
                     <button 
-                        onClick={() => setEditingUser(userData)} // Modal open karne ke liye
+                        onClick={() => setEditingUser(userData)}
                         className="flex items-center gap-2 px-5 py-2 text-sm font-bold bg-white border border-slate-200 rounded-md hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-all text-slate-700 shadow-sm"
                     >
                         <FiEdit2 size={14} /> Edit Profile
@@ -69,30 +65,35 @@ export const ProfileTable = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                             <div className="space-y-1 col-span-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12} /> Profile Photo URL</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
+                                <input className="w-full text-black p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.name} onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })} />
+                                <input className="w-full text-black p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.name} onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.role} onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })} />
+                                <input className="w-full text-black p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.role} onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} />
+                                <input className="w-full text-black p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Status</label>
-                                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.status} onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}>
+                                <select className="w-full p-3 rounded-xl border text-black border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.status} onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}>
                                     <option value="Active">Active</option>
                                     <option value="Pending">Pending</option>
                                 </select>
                             </div>
                             <div className="space-y-1 col-span-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Location</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.location} onChange={(e) => setEditingUser({ ...editingUser, location: e.target.value })} />
+                                <input className="w-full p-3 rounded-xl text-black border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.location} onChange={(e) => setEditingUser({ ...editingUser, location: e.target.value })} />
+                            </div>
+                            {/* --- Bio Edit Field Added Here --- */}
+                            <div className="space-y-1 col-span-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bio / About</label>
+                                <textarea rows={3} className="w-full p-3 rounded-xl border text-black border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm resize-none" value={editingUser.bio} onChange={(e) => setEditingUser({ ...editingUser, bio: e.target.value })} />
                             </div>
                         </div>
 

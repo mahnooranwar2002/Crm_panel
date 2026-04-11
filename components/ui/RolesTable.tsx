@@ -23,8 +23,8 @@ const RolesTable = () => {
           </h1>
           <p className="text-sm text-slate-500 mt-1">Define access levels and security protocols for your team.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-2xl font-bold text-sm transition-all shadow-lg shadow-emerald-100 active:scale-95">
-          <FiPlus size={18} />
+        <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-200 active:scale-95">
+                  <FiPlus size={18} />
           <span>Define New Role</span>
         </button>
       </div>
