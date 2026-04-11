@@ -1,85 +1,4 @@
-<<<<<<< HEAD
-// import type { Metadata } from "next";
-// import { Geist, Geist_Mono } from "next/font/google";
-// import "./globals.css";
-// import { Sidebar } from "@/components/layout/sidebar";
-// import { Navbar } from "@/components/layout/navbar";
 
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
-// export const metadata: Metadata = {
-//   title: "Wholcure CRM",
-//   description: "Professional Next.js Dashboard",
-// };
-
-// export default function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   return (
-// <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
-//       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f4f7fa] text-slate-900`}>
-//         <div className="flex h-screen overflow-hidden">
-//           <Sidebar />
-
-//           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-//             <Navbar />
-            
-//             {/* Main Content Area */}
-//             <main className="flex-1 overflow-y-auto p-6 md:p-10">
-//               <div className="max-w-[1600px] mx-auto">
-//                 {children}
-//               </div>
-//             </main>
-//           </div>
-//         </div>
-//       </body>
-//     </html>
-//   );
-// }
-
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css"; // Check karein ye path sahi ho
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Wholcure CRM",
-  description: "Professional Next.js Dashboard",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f4f7fa] text-slate-900`}>
-        {children}
-      </body>
-    </html>
-  );
-}
-=======
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -113,4 +32,4 @@ export default function RootLayout({
     </html>
   );
 }
->>>>>>> 1f0dd449541156b4069757ed692715fe6e0166b7
+
