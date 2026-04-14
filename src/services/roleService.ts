@@ -10,7 +10,7 @@ export const RoleService = {
       
       const queryString = new URLSearchParams(params).toString();
       const response = await apiRequest(`/roles${queryString ? '?' + queryString : ''}`);
-      return response.data;
+      return response.data || response;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -19,7 +19,40 @@ export const RoleService = {
   async getRoleById(id: string) {
     try {
       const response = await apiRequest(`/roles/${id}`);
-      return response.data;
+      return response.data || response;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  async createRole(roleData: any) {
+    try {
+      const response = await apiRequest('/roles', {
+        method: 'POST',
+        body: JSON.stringify(roleData),
+      });
+      return response.data || response;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  async updateRole(id: string, roleData: any) {
+    try {
+      const response = await apiRequest(`/roles/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(roleData),
+      });
+      return response.data || response;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  async deleteRole(id: string) {
+    try {
+      await apiRequest(`/roles/${id}`, { method: 'DELETE' });
+      return true;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

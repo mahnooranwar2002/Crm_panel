@@ -1,37 +1,89 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiUser, FiX, FiLink } from 'react-icons/fi';
+import { AuthService } from '@/src/services/authService';
 
-const initialData = {
-    id: 1,
-    name: "John Doe",
-    role: "Team Manager",
-    location: "Arizona, United States",
-    email: "randomuser@pimjo.com",
-    bio: "Experienced Team Manager specializing in project delivery.",
-    image: "",
-    status: "Active"
-};
+// 1. Define the User Profile interface
+interface UserProfile {
+    id?: string;
+    name: string;
+    role: string;
+    email: string;
+    location: string;
+    status: string;
+    image?: string;
+    bio?: string;
+}
 
 export const ProfileTable = () => {
-    const [userData, setUserData] = useState(initialData);
-    const [editingUser, setEditingUser] = useState<any>(null);
+    // 2. Apply the interface to state
+    const [userData, setUserData] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
 
-    const updateUser = (e: React.FormEvent) => {
-        e.preventDefault();
-        setUserData(editingUser);
-        setEditingUser(null);
+    useEffect(() => {
+        fetchCurrentUser();
+    }, []);
+
+    const fetchCurrentUser = async () => {
+        try {
+            setLoading(true);
+            const user = await AuthService.getCurrentUser();
+            setUserData(user);
+            setError(null);
+        } catch (err: any) {
+            console.error('Error fetching user:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const updateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            if (editingUser) {
+                setUserData(editingUser);
+                setEditingUser(null);
+            }
+        } catch (err: any) {
+            console.error('Error:', err);
+            alert('Error: ' + err.message);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="w-full space-y-6 p-4 md:p-6 bg-[#F1F5F9] min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+            </div>
+        );
+    }
+
+    if (error || !userData) {
+        return (
+            <div className="w-full space-y-6 p-4 md:p-6 bg-[#F1F5F9] min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-rose-600 font-semibold">{error || "No user data found"}</p>
+                    <button onClick={fetchCurrentUser} className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full space-y-6 p-4 md:p-6 bg-[#F1F5F9] min-h-screen">
             
             {/* --- 1. Top Profile Header Card --- */}
-            <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="bg-white text-black rounded-sm border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md bg-primary flex-shrink-0 flex items-center justify-center text-white text-2xl font-bold">
-                            {userData.name.split(' ').map(n => n[0]).join('')}
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md bg-emerald-600 flex-shrink-0 flex items-center justify-center text-white text-2xl font-bold">
+                            {/* 3. Safe Initials Logic */}
+                            {userData.name ? userData.name.split(' ').map(n => n[0]).join('') : 'U'}
                         </div>
                     </div>
                     <div>
@@ -65,7 +117,7 @@ export const ProfileTable = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                             <div className="space-y-1 col-span-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12} /> Profile Photo URL</label>
-                                <input className="w-full text-black p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
+                                <input className="w-full text-black p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image || ''} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
@@ -90,10 +142,9 @@ export const ProfileTable = () => {
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Location</label>
                                 <input className="w-full p-3 rounded-xl text-black border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.location} onChange={(e) => setEditingUser({ ...editingUser, location: e.target.value })} />
                             </div>
-                            {/* --- Bio Edit Field Added Here --- */}
                             <div className="space-y-1 col-span-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bio / About</label>
-                                <textarea rows={3} className="w-full p-3 rounded-xl border text-black border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm resize-none" value={editingUser.bio} onChange={(e) => setEditingUser({ ...editingUser, bio: e.target.value })} />
+                                <textarea rows={3} className="w-full p-3 rounded-xl border text-black border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm resize-none" value={editingUser.bio || ''} onChange={(e) => setEditingUser({ ...editingUser, bio: e.target.value })} />
                             </div>
                         </div>
 
@@ -137,7 +188,7 @@ export const ProfileTable = () => {
 
                         <div className="md:col-span-2 border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
                             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Bio / About</label>
-                            <p className="text-black font-medium text-base leading-relaxed">{userData.bio}</p>
+                            <p className="text-black font-medium text-base leading-relaxed">{userData.bio || 'No bio provided'}</p>
                         </div>
                     </div>
                 </div>

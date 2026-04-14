@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://crmbackend-tan.vercel.app/api';
 
 export async function apiRequest(endpoint: any, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -8,7 +8,7 @@ export async function apiRequest(endpoint: any, options = {}) {
   };
 
   // Add token if available
-  const token = localStorage.getItem('authToken');
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }

@@ -8,13 +8,13 @@ export const UserService = {
         method: 'POST',
         body: JSON.stringify(userData),
       });
-      return response.data;
+      return response.data || response;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
   },
 
-    async getUsers(page = 1, limit = 10, search = '', status = '') {
+  async getUsers(page = 1, limit = 10, search = '', status = '') {
     try {
       const params: any = { page, limit };
       if (search) params.search = search;
@@ -22,7 +22,7 @@ export const UserService = {
       
       const queryString = new URLSearchParams(params).toString();
       const response = await apiRequest(`/users${queryString ? '?' + queryString : ''}`);
-      return response.data;
+      return response.data || response;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -31,7 +31,7 @@ export const UserService = {
   async getUserById(id: string) {
     try {
       const response = await apiRequest(`/users/${id}`);
-      return response.data;
+      return response.data || response;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -43,7 +43,7 @@ export const UserService = {
         method: 'PUT',
         body: JSON.stringify(userData),
       });
-      return response.data;
+      return response.data || response;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

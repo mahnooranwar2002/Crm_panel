@@ -4,14 +4,17 @@ import { handleApiError } from '../utils/errorHandler';
 export const LeadService = {
   async getLeads(page = 1, limit = 10, search = '', status = '', source = '') {
     try {
-      const params: any = { page, limit };
-      if (search) params.search = search;
-      if (status) params.status = status;
-      if (source) params.source = source;
-      
-      const queryString = new URLSearchParams(params).toString();
-      const response = await apiRequest(`/leads${queryString ? '?' + queryString : ''}`);
-      return response.data;
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(search && { search }),
+        ...(status && { status }),
+        ...(source && { source }),
+      });
+
+      const response = await apiRequest(`/leads?${params.toString()}`);
+      // Consistent return: hamesha leads array aur meta data return karein
+      return response.data || response;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -20,10 +23,44 @@ export const LeadService = {
   async getLeadById(id: string) {
     try {
       const response = await apiRequest(`/leads/${id}`);
-      return response.data;
+      return response.data || response;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  async createLead(leadData: any) {
+    try {
+      const response = await apiRequest('/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(leadData),
+      });
+      return response.data || response;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  async updateLead(id: string, leadData: any) {
+    try {
+      const response = await apiRequest(`/leads/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(leadData),
+      });
+      return response.data || response;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  async deleteLead(id: string) {
+    try {
+      await apiRequest(`/leads/${id}`, { method: 'DELETE' });
+      return true;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
   },
 };
-
