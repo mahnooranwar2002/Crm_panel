@@ -23,6 +23,7 @@ export const UserService = {
       const queryString = new URLSearchParams(params).toString();
       const response = await apiRequest(`/users${queryString ? '?' + queryString : ''}`);
       return response.data || response;
+      console.log('Fetched users:', response.data);
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
