@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client"
 import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiUser, FiX, FiLink } from 'react-icons/fi';
@@ -195,4 +196,151 @@ export const ProfileTable = () => {
             </div>
         </div>
     );
+=======
+"use client"
+import React, { useState } from 'react';
+// FiX aur FiLink add kiye gaye hain
+import { FiEdit2, FiUser, FiX, FiLink } from 'react-icons/fi';
+
+// Initial dummy data
+const initialData = {
+    id: 1,
+    name: "John Doe",
+    role: "Team Manager",
+    location: "Arizona, United States",
+    email: "randomuser@pimjo.com",
+    bio: "Experienced Team Manager specializing in project delivery.",
+    image: "",
+    status: "Active"
+};
+
+export const ProfileTable = () => {
+    const [userData, setUserData] = useState(initialData);
+    const [editingUser, setEditingUser] = useState<any>(null);
+
+    const updateUser = (e: React.FormEvent) => {
+        e.preventDefault();
+        setUserData(editingUser); // Main state update ho rahi hai
+        setEditingUser(null);
+    };
+
+    return (
+        <div className="w-full space-y-6 p-4 md:p-6 bg-[#F1F5F9] min-h-screen">
+            
+            {/* --- 1. Top Profile Header Card --- */}
+            <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <div className="flex items-center gap-4">
+                    <div className="relative group">
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md bg-primary flex-shrink-0 flex items-center justify-center text-white text-2xl font-bold">
+                            {/* Name ke initials display honge */}
+                            {userData.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-semibold text-black">{userData.name}</h3>
+                        <p className="text-sm font-medium text-slate-500">
+                            {userData.role} <span className="mx-2">|</span> {userData.location}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button 
+                        onClick={() => setEditingUser(userData)} // Modal open karne ke liye
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-bold bg-white border border-slate-200 rounded-md hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-all text-slate-700 shadow-sm"
+                    >
+                        <FiEdit2 size={14} /> Edit Profile
+                    </button>
+                </div>
+            </div>
+
+            {/* --- EDIT MODAL --- */}
+            {editingUser && (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setEditingUser(null)}></div>
+                    <form onSubmit={updateUser} className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 space-y-4 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center border-b pb-4">
+                            <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight">Edit Profile</h3>
+                            <button type="button" onClick={() => setEditingUser(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-400 transition-all"><FiX size={20} /></button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <div className="space-y-1 col-span-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12} /> Profile Photo URL</label>
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.name} onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })} />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</label>
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.role} onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })} />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Status</label>
+                                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.status} onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}>
+                                    <option value="Active">Active</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1 col-span-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Location</label>
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.location} onChange={(e) => setEditingUser({ ...editingUser, location: e.target.value })} />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-6">
+                            <button type="button" onClick={() => setEditingUser(null)} className="flex-1 py-3 bg-slate-50 text-slate-600 rounded-xl font-bold hover:bg-slate-100 transition-all">Cancel</button>
+                            <button type="submit" className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            )}
+
+            {/* --- 2. Information Card --- */}
+            <div className="bg-white rounded-sm border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-7 py-4 border-b border-slate-100">
+                    <h3 className="font-semibold text-black flex items-center gap-2">
+                        <FiUser className="text-slate-400" /> Personal Information
+                    </h3>
+                </div>
+
+                <div className="p-7">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                        <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Full Name</label>
+                            <p className="text-black font-semibold text-base">{userData.name}</p>
+                        </div>
+
+                        <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Email Address</label>
+                            <p className="text-black font-semibold text-base">{userData.email}</p>
+                        </div>
+
+                        <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Role / Designation</label>
+                            <p className="text-black font-semibold text-base">{userData.role}</p>
+                        </div>
+
+                        <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Location</label>
+                            <p className="text-black font-semibold text-base">{userData.location}</p>
+                        </div>
+
+                        <div className="md:col-span-2 border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Bio / About</label>
+                            <p className="text-black font-medium text-base leading-relaxed">{userData.bio}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+>>>>>>> main
 };
