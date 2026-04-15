@@ -1,17 +1,44 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiShield, FiEdit3, FiTrash2, FiPlus, FiCheckCircle, FiLock, FiSettings } from 'react-icons/fi';
-
-// Dummy Roles Data based on RBAC documentation
-const initialRoles = [
-  { id: 1, role_name: 'Super Admin', status: 1, permissions: 'All Access', users_count: 2 },
-  { id: 2, role_name: 'Sales Manager', status: 1, permissions: 'View, Edit, Delete', users_count: 5 },
-  { id: 3, role_name: 'Sales Agent', status: 1, permissions: 'View, Edit (Own)', users_count: 12 },
-  { id: 4, role_name: 'Support Executive', status: 0, permissions: 'View Only', users_count: 4 },
-];
+import { RoleService } from '@/src/services/roleService';
 
 const RolesTable = () => {
-  const [roles, setRoles] = useState(initialRoles);
+  const [roles, setRoles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch roles from API on component mount
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      setLoading(true);
+      const data = await RoleService.getRoles(1, 100);
+      // Backend returns: { roles: [], pagination: {...} }
+      const rolesArray = data?.roles || [];
+      setRoles(rolesArray);
+      setError(null);
+    } catch (err: any) {
+      console.error('Error fetching roles:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRole = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this role?')) {
+      try {
+        await RoleService.deleteRole(id);
+        await fetchRoles();
+      } catch (err: any) {
+        alert('Error: ' + err.message);
+      }
+    }
+  };
 
   return (
     <div className="w-full space-y-6 animate-in slide-in-from-bottom-4 duration-500">
@@ -29,6 +56,13 @@ const RolesTable = () => {
         </button>
       </div>
 
+      {/* --- ERROR MESSAGE --- */}
+      {error && (
+        <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-lg">
+          Error: {error}
+        </div>
+      )}
+
       {/* --- ROLES GRID/TABLE --- */}
       <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="overflow-x-auto">
@@ -43,46 +77,56 @@ const RolesTable = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {roles.map((role) => (
-                <tr key={role.id} className="hover:bg-indigo-50/20 transition-all duration-300 group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${role.role_name === 'Super Admin' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
-                        <FiLock size={18} />
-                      </div>
-                      <span className="font-bold text-slate-800 text-[15px]">{role.role_name}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="text-sm font-medium text-slate-500 bg-white border border-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
-                      {role.permissions}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-center">
-                    <span className="text-[13px] font-extrabold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
-                      {role.users_count}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex justify-center">
-                      <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${role.status === 1 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${role.status === 1 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
-                        {role.status === 1 ? 'Active' : 'Disabled'}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button title="Edit Permissions" className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-white rounded-xl transition-all hover:shadow-md">
-                        <FiSettings size={18} />
-                      </button>
-                      <button title="Delete Role" className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all hover:shadow-md">
-                        <FiTrash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-8 text-center text-slate-500">Loading roles...</td>
                 </tr>
-              ))}
+              ) : roles.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-8 text-center text-slate-500">No roles found</td>
+                </tr>
+              ) : (
+                roles.map((role) => (
+                  <tr key={role.id} className="hover:bg-indigo-50/20 transition-all duration-300 group">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2.5 rounded-xl ${role.role_name === 'Super Admin' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                          <FiLock size={18} />
+                        </div>
+                        <span className="font-bold text-slate-800 text-[15px]">{role.role_name || role.name || 'N/A'}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className="text-sm font-medium text-slate-500 bg-white border border-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
+                        {role.permissions || 'N/A'}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-center">
+                      <span className="text-[13px] font-extrabold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
+                        {role.users_count || 0}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex justify-center">
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${role.status === 1 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${role.status === 1 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
+                          {role.status === 1 ? 'Active' : 'Disabled'}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button title="Edit Permissions" className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-white rounded-xl transition-all hover:shadow-md">
+                          <FiSettings size={18} />
+                        </button>
+                        <button title="Delete Role" onClick={() => handleDeleteRole(role._id)} className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all hover:shadow-md">
+                          <FiTrash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

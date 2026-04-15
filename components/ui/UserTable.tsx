@@ -5,24 +5,25 @@ import { UserService } from '@/src/services/userService';
 
 // Types for better development experience
 interface User {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
-  role: string;
+  role?: string | any;
   status: string;
   email: string;
-  phone: string;
-  location: string;
-  image?: string;
+  phone?: string;
+  avatar?: string;
+  lastLogin?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-const emptyUser = {
+const emptyUser: User = {
   name: '',
-  role: '',
-  status: 'Active',
+  status: 'ACTIVE',
   email: '',
   phone: '',
-  location: '',
-  image: '',
+  avatar: '',
 };
 
 export const UserTable = () => {
@@ -41,7 +42,8 @@ export const UserTable = () => {
     try {
       setLoading(true);
       const data = await UserService.getUsers(1, 100);
-      const usersArray = Array.isArray(data) ? data : data?.users || [];
+      // Backend returns: { users: [], pagination: {...} }
+      const usersArray = data?.users || [];
       setUserData(usersArray);
       setError(null);
     } catch (err: any) {
@@ -54,11 +56,11 @@ export const UserTable = () => {
 
   const getStatusStyles = (status: string) => {
     switch (status) {
+      case 'ACTIVE':
       case 'Active':
         return { wrapper: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' };
-      case 'Away':
-        return { wrapper: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' };
-      case 'Busy at work':
+      case 'INACTIVE':
+      case 'Offline':
       case 'Offline':
         return { wrapper: 'bg-rose-100 text-rose-700', dot: 'bg-rose-500' };
       default:
@@ -81,7 +83,16 @@ export const UserTable = () => {
     e.preventDefault();
     if (!editingUser) return;
     try {
-      await UserService.updateUser(editingUser.id, editingUser);
+      // Clean the user data: remove empty fields
+      const cleanedUser = Object.fromEntries(
+        Object.entries(editingUser).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+      );
+      const userId = editingUser._id || editingUser.id;
+      if (!userId) {
+        alert('Error: User ID not found');
+        return;
+      }
+      await UserService.updateUser(userId, cleanedUser);
       await fetchUsers();
       setEditingUser(null);
     } catch (err: any) {
@@ -92,7 +103,11 @@ export const UserTable = () => {
   const addUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await UserService.createUser(addingUser);
+      // Clean the user data: remove empty fields
+      const cleanedUser = Object.fromEntries(
+        Object.entries(addingUser).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+      );
+      await UserService.createUser(cleanedUser);
       await fetchUsers();
       setAddingUser(null);
     } catch (err: any) {
@@ -142,17 +157,17 @@ export const UserTable = () => {
                 {userData.map((user) => {
                   const styles = getStatusStyles(user.status);
                   return (
-                    <tr key={user.id} className="hover:bg-emerald-50/30 transition-all duration-200 group">
+                    <tr key={user._id || user.id} className="hover:bg-emerald-50/30 transition-all duration-200 group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <img 
-                            src={user.image || `https://ui-avatars.com/api/?name=${user.name}&background=random`} 
+                            src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=random`} 
                             className="h-11 w-11 rounded-2xl object-cover ring-4 ring-slate-50 shadow-sm" 
                             alt={user.name} 
                           />
                           <div>
                             <p className="font-bold text-slate-800 text-[15px] leading-tight">{user.name}</p>
-                            <p className="text-[10px] text-emerald-500 font-black uppercase mt-1 tracking-wider">{user.role}</p>
+                            <p className="text-[10px] text-emerald-500 font-black uppercase mt-1 tracking-wider">{typeof user.role === 'string' ? user.role : user.role?.name || 'No Role'}</p>
                           </div>
                         </div>
                       </td>
@@ -174,7 +189,7 @@ export const UserTable = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button onClick={() => setSelectedUser(user)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"><FiEye size={20} /></button>
                           <button onClick={() => setEditingUser(user)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"><FiEdit2 size={18} /></button>
-                          <button onClick={() => deleteUser(user.id)} className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><FiTrash2 size={20} /></button>
+                          <button onClick={() => deleteUser(user._id || user.id || '')} className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><FiTrash2 size={20} /></button>
                         </div>
                       </td>
                     </tr>
@@ -197,8 +212,8 @@ export const UserTable = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="space-y-1 col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12}/> Profile Photo URL</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.image} onChange={(e) => setAddingUser({...addingUser, image: e.target.value})} />
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12}/> Avatar URL</label>
+                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.avatar || ''} onChange={(e) => setAddingUser({...addingUser, avatar: e.target.value})} placeholder="https://..." />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Full Name</label>
@@ -206,28 +221,22 @@ export const UserTable = () => {
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Role</label>
-                <input required className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.role} onChange={(e) => setAddingUser({...addingUser, role: e.target.value})} />
+                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.role || ''} onChange={(e) => setAddingUser({...addingUser, role: e.target.value})} placeholder="e.g. Manager" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 col-span-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Email Address</label>
                 <input required type="email" className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.email} onChange={(e) => setAddingUser({...addingUser, email: e.target.value})} />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Status</label>
-                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.status} onChange={(e) => setAddingUser({...addingUser, status: e.target.value})}>
-                  <option value="Active">Active</option>
-                  <option value="Away">Away</option>
-                  <option value="Busy at work">Busy at work</option>
-                  <option value="Offline">Offline</option>
-                </select>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Phone</label>
+                <input type="tel" className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.phone || ''} onChange={(e) => setAddingUser({...addingUser, phone: e.target.value})} placeholder="+92..." />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Phone</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.phone} onChange={(e) => setAddingUser({...addingUser, phone: e.target.value})} />
-              </div>
-              <div className="space-y-1 col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Location</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.location} onChange={(e) => setAddingUser({...addingUser, location: e.target.value})} />
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Status</label>
+                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={addingUser.status} onChange={(e) => setAddingUser({...addingUser, status: e.target.value})}>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
               </div>
             </div>
             <div className="flex gap-3 pt-6">
@@ -247,27 +256,27 @@ export const UserTable = () => {
             <button onClick={() => setSelectedUser(null)} className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition-colors"><FiX size={20} /></button>
             <div className="px-8 pb-8">
               <div className="relative -mt-12 mb-4">
-                <img src={selectedUser.image || `https://ui-avatars.com/api/?name=${selectedUser.name}`} className="h-24 w-24 rounded-3xl object-cover border-4 border-white shadow-lg mx-auto" alt="" />
+                <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${selectedUser.name}`} className="h-24 w-24 rounded-3xl object-cover border-4 border-white shadow-lg mx-auto" alt="" />
               </div>
               <div className="text-center space-y-1 mb-6">
                 <h2 className="text-2xl font-bold text-slate-800">{selectedUser.name}</h2>
-                <p className="text-emerald-600 font-bold text-sm uppercase tracking-widest">{selectedUser.role}</p>
+                <p className="text-emerald-600 font-bold text-sm uppercase tracking-widest">{typeof selectedUser.role === 'string' ? selectedUser.role : selectedUser.role?.name || 'No Role'}</p>
                 <div className="pt-2 flex justify-center">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusStyles(selectedUser.status).wrapper}`}>{selectedUser.status} Member</span>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusStyles(selectedUser.status).wrapper}`}>{selectedUser.status}</span>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-slate-600">
                   <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><FiMail size={18} /></div>
-                  <div><p className="text-[10px] uppercase font-bold text-slate-400">Email Address</p><p className="text-sm font-semibold">{selectedUser.email}</p></div>
+                  <div><p className="text-[10px] uppercase font-bold text-slate-400">Email Address</p><p className="text-sm font-semibold">{selectedUser.email || 'N/A'}</p></div>
                 </div>
                 <div className="flex items-center gap-4 text-slate-600">
                   <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><FiPhone size={18} /></div>
-                  <div><p className="text-[10px] uppercase font-bold text-slate-400">Phone Number</p><p className="text-sm font-semibold">{selectedUser.phone}</p></div>
+                  <div><p className="text-[10px] uppercase font-bold text-slate-400">Phone Number</p><p className="text-sm font-semibold">{selectedUser.phone || 'N/A'}</p></div>
                 </div>
                 <div className="flex items-center gap-4 text-slate-600">
                   <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><FiMapPin size={18} /></div>
-                  <div><p className="text-[10px] uppercase font-bold text-slate-400">Location</p><p className="text-sm font-semibold">{selectedUser.location}</p></div>
+                  <div><p className="text-[10px] uppercase font-bold text-slate-400">Last Login</p><p className="text-sm font-semibold">{selectedUser.lastLogin ? new Date(selectedUser.lastLogin).toLocaleDateString() : 'Never'}</p></div>
                 </div>
               </div>
             </div>
@@ -286,8 +295,8 @@ export const UserTable = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="space-y-1 col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12}/> Profile Photo URL</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.image || ''} onChange={(e) => setEditingUser({...editingUser, image: e.target.value})} />
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12}/> Avatar URL</label>
+                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.avatar || ''} onChange={(e) => setEditingUser({...editingUser, avatar: e.target.value})} placeholder="https://..." />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Full Name</label>
@@ -295,28 +304,22 @@ export const UserTable = () => {
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Role</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.role} onChange={(e) => setEditingUser({...editingUser, role: e.target.value})} />
+                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={typeof editingUser.role === 'string' ? editingUser.role : editingUser.role?.name || ''} onChange={(e) => setEditingUser({...editingUser, role: e.target.value})} placeholder="e.g. Manager" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 col-span-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Email Address</label>
                 <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.email} onChange={(e) => setEditingUser({...editingUser, email: e.target.value})} />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Account Status</label>
-                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.status} onChange={(e) => setEditingUser({...editingUser, status: e.target.value})}>
-                  <option value="Active">Active</option>
-                  <option value="Away">Away</option>
-                  <option value="Busy at work">Busy at work</option>
-                  <option value="Offline">Offline</option>
-                </select>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Phone</label>
+                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.phone || ''} onChange={(e) => setEditingUser({...editingUser, phone: e.target.value})} placeholder="+92..." />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Phone</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.phone} onChange={(e) => setEditingUser({...editingUser, phone: e.target.value})} />
-              </div>
-              <div className="space-y-1 col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Location</label>
-                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.location} onChange={(e) => setEditingUser({...editingUser, location: e.target.value})} />
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Account Status</label>
+                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 text-sm" value={editingUser.status} onChange={(e) => setEditingUser({...editingUser, status: e.target.value})}>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
               </div>
             </div>
             <div className="flex gap-3 pt-6">

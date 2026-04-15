@@ -1,47 +1,109 @@
 "use client"
-import React, { useState } from 'react';
-// FiX aur FiLink add kiye gaye hain
+import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiUser, FiX, FiLink } from 'react-icons/fi';
-
-// Initial dummy data
-const initialData = {
-    id: 1,
-    name: "John Doe",
-    role: "Team Manager",
-    location: "Arizona, United States",
-    email: "randomuser@pimjo.com",
-    bio: "Experienced Team Manager specializing in project delivery.",
-    image: "",
-    status: "Active"
-};
+import { UserService } from '@/src/services/userService';
 
 export const ProfileTable = () => {
-    const [userData, setUserData] = useState(initialData);
+    const [userData, setUserData] = useState<any>(null);
     const [editingUser, setEditingUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const updateUser = (e: React.FormEvent) => {
-        e.preventDefault();
-        setUserData(editingUser); // Main state update ho rahi hai
-        setEditingUser(null);
+    // Fetch current user profile on component mount
+    useEffect(() => {
+        fetchUserProfile();
+    }, []);
+
+    const fetchUserProfile = async () => {
+        try {
+            setLoading(true);
+            // Get users list from API - backend returns { users: [], pagination: {...} }
+            const data = await UserService.getUsers(1, 1);
+            const usersArray = data?.users || [];
+            if (usersArray.length > 0) {
+                setUserData(usersArray[0]);
+            } else {
+                // Fallback to empty user data
+                setUserData({
+                    _id: null,
+                    name: "User",
+                    role: "Team Member",
+                    location: "N/A",
+                    email: "user@example.com",
+                    status: "ACTIVE"
+                });
+            }
+            setError(null);
+        } catch (err: any) {
+            console.error('Error fetching user profile:', err);
+            setError(err.message);
+            // Set default user data on error
+            setUserData({
+                _id: null,
+                name: "User",
+                role: "Team Member",
+                location: "N/A",
+                email: "user@example.com",
+                status: "ACTIVE"
+            });
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const updateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const userId = userData?._id || userData?.id;
+            if (userId) {
+                // Clean the user data: remove empty fields
+                const cleanedUser = Object.fromEntries(
+                    Object.entries(editingUser).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+                );
+                await UserService.updateUser(userId, cleanedUser);
+                setUserData(editingUser);
+            } else {
+                // If no ID, just update local state
+                setUserData(editingUser);
+            }
+            setEditingUser(null);
+        } catch (err: any) {
+            alert('Error: ' + err.message);
+        }
+    };
+
+    if (loading) {
+        return <div className="w-full p-4 text-center">Loading profile...</div>;
+    }
+
+    if (!userData) {
+        return <div className="w-full p-4 text-center">No user data available</div>;
+    }
 
     return (
         <div className="w-full space-y-6 p-4 md:p-6 bg-[#F1F5F9] min-h-screen">
+            
+            {/* --- ERROR MESSAGE --- */}
+            {error && (
+                <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-lg">
+                    Error: {error}
+                </div>
+            )}
             
             {/* --- 1. Top Profile Header Card --- */}
             <div className="bg-white rounded-sm border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                 
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md bg-primary flex-shrink-0 flex items-center justify-center text-white text-2xl font-bold">
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md bg-emerald-600 flex-shrink-0 flex items-center justify-center text-white text-2xl font-bold">
                             {/* Name ke initials display honge */}
-                            {userData.name.split(' ').map(n => n[0]).join('')}
+                            {userData.name ? userData.name.split(' ').map((n: string) => n[0]).join('') : 'U'}
                         </div>
                     </div>
                     <div>
-                        <h3 className="text-xl font-semibold text-black">{userData.name}</h3>
+                        <h3 className="text-xl font-semibold text-black">{userData.name || 'N/A'}</h3>
                         <p className="text-sm font-medium text-slate-500">
-                            {userData.role} <span className="mx-2">|</span> {userData.location}
+                            {userData.role || 'N/A'} <span className="mx-2">|</span> {userData.location || 'N/A'}
                         </p>
                     </div>
                 </div>
@@ -69,30 +131,31 @@ export const ProfileTable = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                             <div className="space-y-1 col-span-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><FiLink size={12} /> Profile Photo URL</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.image || ''} onChange={(e) => setEditingUser({ ...editingUser, image: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.name} onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })} />
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.name || ''} onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.role} onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })} />
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.role || ''} onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.email} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} />
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.email || ''} onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Status</label>
-                                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.status} onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}>
+                                <select className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.status || 'Active'} onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}>
                                     <option value="Active">Active</option>
                                     <option value="Pending">Pending</option>
+                                    <option value="Inactive">Inactive</option>
                                 </select>
                             </div>
                             <div className="space-y-1 col-span-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Location</label>
-                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.location} onChange={(e) => setEditingUser({ ...editingUser, location: e.target.value })} />
+                                <input className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" value={editingUser.location || ''} onChange={(e) => setEditingUser({ ...editingUser, location: e.target.value })} />
                             </div>
                         </div>
 
@@ -116,27 +179,27 @@ export const ProfileTable = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
                         <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
                             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Full Name</label>
-                            <p className="text-black font-semibold text-base">{userData.name}</p>
+                            <p className="text-black font-semibold text-base">{userData.name || 'N/A'}</p>
                         </div>
 
                         <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
                             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Email Address</label>
-                            <p className="text-black font-semibold text-base">{userData.email}</p>
+                            <p className="text-black font-semibold text-base">{userData.email || 'N/A'}</p>
                         </div>
 
                         <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
                             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Role / Designation</label>
-                            <p className="text-black font-semibold text-base">{userData.role}</p>
+                            <p className="text-black font-semibold text-base">{userData.role || 'N/A'}</p>
                         </div>
 
                         <div className="border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
                             <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Location</label>
-                            <p className="text-black font-semibold text-base">{userData.location}</p>
+                            <p className="text-black font-semibold text-base">{userData.location || 'N/A'}</p>
                         </div>
 
                         <div className="md:col-span-2 border-l-2 border-transparent hover:border-emerald-500 pl-4 transition-all">
-                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Bio / About</label>
-                            <p className="text-black font-medium text-base leading-relaxed">{userData.bio}</p>
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Account Status</label>
+                            <p className="text-black font-medium text-base leading-relaxed">{userData.status || 'N/A'}</p>
                         </div>
                     </div>
                 </div>

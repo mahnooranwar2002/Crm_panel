@@ -10,7 +10,8 @@ export const RoleService = {
       
       const queryString = new URLSearchParams(params).toString();
       const response = await apiRequest(`/roles${queryString ? '?' + queryString : ''}`);
-      return response.data || response;
+      // Backend returns: { statusCode, data: { roles: [], pagination: {} }, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -19,7 +20,8 @@ export const RoleService = {
   async getRoleById(id: string) {
     try {
       const response = await apiRequest(`/roles/${id}`);
-      return response.data || response;
+      // Backend returns: { statusCode, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -29,9 +31,11 @@ export const RoleService = {
     try {
       const response = await apiRequest('/roles', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(roleData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 201, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -41,9 +45,11 @@ export const RoleService = {
     try {
       const response = await apiRequest(`/roles/${id}`, {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(roleData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 200, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -51,8 +57,9 @@ export const RoleService = {
 
   async deleteRole(id: string) {
     try {
-      await apiRequest(`/roles/${id}`, { method: 'DELETE' });
-      return true;
+      const response = await apiRequest(`/roles/${id}`, { method: 'DELETE' });
+      // Backend returns: { statusCode: 200, data: null, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

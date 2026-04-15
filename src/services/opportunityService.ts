@@ -12,7 +12,8 @@ export const OpportunityService = {
       });
 
       const response = await apiRequest(`/opportunities?${params.toString()}`);
-      return response.data || response;
+      // Backend returns: { statusCode, data: { opportunities: [], pagination: {} }, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -21,7 +22,8 @@ export const OpportunityService = {
   async getOpportunityById(id: string) {
     try {
       const response = await apiRequest(`/opportunities/${id}`);
-      return response.data || response;
+      // Backend returns: { statusCode, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -34,7 +36,8 @@ export const OpportunityService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(opportunityData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 201, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -47,7 +50,8 @@ export const OpportunityService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(opportunityData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 200, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -55,8 +59,9 @@ export const OpportunityService = {
 
   async deleteOpportunity(id: string) {
     try {
-      await apiRequest(`/opportunities/${id}`, { method: 'DELETE' });
-      return true;
+      const response = await apiRequest(`/opportunities/${id}`, { method: 'DELETE' });
+      // Backend returns: { statusCode: 200, data: null, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

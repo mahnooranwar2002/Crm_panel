@@ -13,8 +13,8 @@ export const LeadService = {
       });
 
       const response = await apiRequest(`/leads?${params.toString()}`);
-      // Consistent return: hamesha leads array aur meta data return karein
-      return response.data || response;
+      // Backend returns: { statusCode, data: { leads: [], pagination: {} }, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -23,7 +23,8 @@ export const LeadService = {
   async getLeadById(id: string) {
     try {
       const response = await apiRequest(`/leads/${id}`);
-      return response.data || response;
+      // Backend returns: { statusCode, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -36,7 +37,8 @@ export const LeadService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 201, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -49,7 +51,8 @@ export const LeadService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 200, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -57,8 +60,9 @@ export const LeadService = {
 
   async deleteLead(id: string) {
     try {
-      await apiRequest(`/leads/${id}`, { method: 'DELETE' });
-      return true;
+      const response = await apiRequest(`/leads/${id}`, { method: 'DELETE' });
+      // Backend returns: { statusCode: 200, data: null, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

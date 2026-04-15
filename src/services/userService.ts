@@ -6,9 +6,11 @@ export const UserService = {
     try {
       const response = await apiRequest('/users', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 201, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -22,8 +24,8 @@ export const UserService = {
       
       const queryString = new URLSearchParams(params).toString();
       const response = await apiRequest(`/users${queryString ? '?' + queryString : ''}`);
-      return response.data || response;
-      console.log('Fetched users:', response.data);
+      // Backend returns: { statusCode, data: { users: [], pagination: {} }, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -32,7 +34,8 @@ export const UserService = {
   async getUserById(id: string) {
     try {
       const response = await apiRequest(`/users/${id}`);
-      return response.data || response;
+      // Backend returns: { statusCode, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -42,9 +45,11 @@ export const UserService = {
     try {
       const response = await apiRequest(`/users/${id}`, {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
-      return response.data || response;
+      // Backend returns: { statusCode: 200, data: {...}, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -52,8 +57,9 @@ export const UserService = {
 
   async deleteUser(id: string) {
     try {
-      await apiRequest(`/users/${id}`, { method: 'DELETE' });
-      return true;
+      const response = await apiRequest(`/users/${id}`, { method: 'DELETE' });
+      // Backend returns: { statusCode: 200, data: null, message, success }
+      return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
