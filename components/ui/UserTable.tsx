@@ -18,17 +18,7 @@ import { UploadService } from "@/src/services/uploadService";
 import { getAvatarUrl, getInitials } from "@/src/utils/avatarHelper";
 
 // --- Fallback Data ---
-const FALLBACK_USERS = [
-  {
-    _id: "507f1f77bcf86cd799439012",
-    name: "Ahmed Ali",
-    email: "ahmed@example.com",
-    phone: "+923001234567",
-    role: { role_name: "Manager" },
-    status: "INACTIVE",
-    avatar: null,
-  }
-];
+
 
 interface User {
   _id?: string;
@@ -72,11 +62,12 @@ export const UserTable = () => {
     try {
       setLoading(true);
       const data = await UserService.getUsers(1, 100);
-      setUserData(data?.users?.length ? data.users : FALLBACK_USERS);
+      setUserData(data?.users?.length ? data.users :"abc");
+      console.log("Fetched Users:", );
       setError(null);
     } catch (err: any) {
       console.error("Using Fallback Data due to error:", err);
-      setUserData(FALLBACK_USERS);
+   
       setError("Note: Showing fallback data (Backend unreachable)");
     } finally {
       setLoading(false);

@@ -6,6 +6,7 @@ export const UserService = {
     try {
       const data = await UserService.getUsers(1, limit, '', '', 'Sales');
       return data;
+      console.log("Sales Users:", data);
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -18,6 +19,7 @@ export const UserService = {
         body: JSON.stringify(userData),
       });
       // Backend returns: { statusCode: 201, data: {...}, message, success }
+      
       return response.data;
     } catch (error: any) {
       throw new Error(handleApiError(error));
