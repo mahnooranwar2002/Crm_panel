@@ -30,16 +30,47 @@ export const LeadService = {
     }
   },
 
+  // async createLead(leadData: any) {
+  //   try {
+  //     const response = await apiRequest('/leads', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify(leadData),
+  //     });
+  //     // Backend returns: { statusCode: 201, data: {...}, message, success }
+  //     return response.data;
+  //   } catch (error: any) {
+  //     throw new Error(handleApiError(error));
+  //   }
+  // },
+
   async createLead(leadData: any) {
     try {
+      // DEBUG: Check if token and user role are available
+      const token = localStorage.getItem('token');
+      const userJson = localStorage.getItem('user');
+      const user = userJson ? JSON.parse(userJson) : null;
+      
+      console.log('📊 Create Lead Request:');
+      console.log('  Token present:', !!token);
+      console.log('  User:', user?.email);
+      console.log('  User role:', user?.role?.role_name || user?.role || 'NO_ROLE');
+      console.log('  Lead data:', leadData);
+      
       const response = await apiRequest('/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadData),
       });
-      // Backend returns: { statusCode: 201, data: {...}, message, success }
+      
+      console.log('✅ Lead created successfully');
       return response.data;
     } catch (error: any) {
+      console.error('❌ Create Lead Error:', {
+        message: error.message,
+        status: error.status,
+        fullError: error,
+      });
       throw new Error(handleApiError(error));
     }
   },

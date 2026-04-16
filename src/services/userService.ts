@@ -2,6 +2,14 @@ import { apiRequest } from '../api/client';
 import { handleApiError } from '../utils/errorHandler';
 
 export const UserService = {
+  async getSalesUsers(limit = 100) {
+    try {
+      const data = await UserService.getUsers(1, limit, '', '', 'Sales');
+      return data;
+    } catch (error: any) {
+      throw new Error(handleApiError(error));
+    }
+  },
   async createUser(userData: any) {
     try {
       const response = await apiRequest('/users', {
@@ -16,11 +24,12 @@ export const UserService = {
     }
   },
 
-  async getUsers(page = 1, limit = 10, search = '', status = '') {
+  async getUsers(page = 1, limit = 10, search = '', status = '', role?: string) {
     try {
       const params: any = { page, limit };
       if (search) params.search = search;
       if (status) params.status = status;
+      if (role) params.role = role;
       
       const queryString = new URLSearchParams(params).toString();
       const response = await apiRequest(`/users${queryString ? '?' + queryString : ''}`);

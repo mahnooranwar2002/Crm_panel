@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiHome, FiChevronLeft } from "react-icons/fi";
 import { MdManageAccounts } from "react-icons/md";
 import { PiTrendUpDuotone } from "react-icons/pi";
@@ -8,20 +8,67 @@ import { usePathname } from "next/navigation";
 import { FaUsers } from "react-icons/fa6";
 import { useSidebar } from "@/hooks/use-sidebar"; 
 import { HiUserGroup } from "react-icons/hi2";
+import { IoLogoFoursquare } from "react-icons/io";
+import { getAvatarUrl } from '@/src/utils/avatarHelper';
 
-const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
+const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
 
 export const Sidebar = () => {
   const pathname = usePathname();
   const { isCollapsed, toggle } = useSidebar();
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Function to load user data
+  const loadUserData = () => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          setUserInfo(JSON.parse(storedUser));
+        } catch (e) {
+          console.error('Error parsing user info:', e);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    setIsMounted(true);
+    loadUserData();
+
+    // Listen for storage changes (in case profile updates in another tab/window)
+    window.addEventListener('storage', loadUserData);
+    
+    // Optional: Custom event if you update profile in the same tab
+    window.addEventListener('userUpdated', loadUserData);
+
+    return () => {
+      window.removeEventListener('storage', loadUserData);
+      window.removeEventListener('userUpdated', loadUserData);
+    };
+  }, []);
 
   const menuItems = [
-    { icon: FiHome, label: "Dashboard", href: "/home" }, // Dashboard path
-    { icon: FaUsers, label: "User Management", href: "/user" }, // Correct path
+    { icon: FiHome, label: "Dashboard", href: "/home" },
+    { icon: FaUsers, label: "User Management", href: "/user" },
     { icon: MdManageAccounts, label: "Leads Management", href: "/leads" }, 
     { icon: HiUserGroup, label: "Roles Management", href: "/roles" },
+    { icon: IoLogoFoursquare, label: "Companies Management", href: "/companies" },
     { icon: PiTrendUpDuotone, label: "Opportunities", href: "/opportunities" },
   ];
+
+  if (!isMounted) {
+    return (
+      <aside className="h-screen bg-white border-r border-slate-100 flex flex-col sticky top-0 left-0 z-50 w-[280px]">
+        <div className="h-[70px] flex items-center px-6">
+           <div className="w-9 h-9 bg-emerald-500 rounded-xl" />
+        </div>
+        <div className="flex-1 px-3 space-y-1.5" />
+        <div className="p-4 border-t border-slate-50 text-slate-400 text-sm text-center">Loading...</div>
+      </aside>
+    );
+  }
 
   return (
     <aside 
@@ -30,7 +77,6 @@ export const Sidebar = () => {
         isCollapsed ? "w-[80px]" : "w-[280px]"
       )}
     >
-      {/* Logo Section */}
       <div className="h-[70px] flex items-center justify-between px-4 mb-4">
         {!isCollapsed && (
           <div className="flex items-center gap-3 pl-2">
@@ -51,13 +97,11 @@ export const Sidebar = () => {
         </button>
       </div>
 
-      {/* Navigation Links */}
       <nav className="flex-1 px-3 space-y-1.5 overflow-y-auto custom-scrollbar">
         {menuItems.map((item, index) => {
           const isActive = pathname === item.href;
-          
           return (
-            <Link key={index} href={item.href || "#"}>
+            <Link key={index} href={item.href}>
               <div
                 className={cn(
                   "flex items-center p-3.5 rounded-xl cursor-pointer transition-all duration-200 group relative",
@@ -66,16 +110,13 @@ export const Sidebar = () => {
                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
-                {/* Active Indicator Line */}
                 {isActive && (
-                  <div className="absolute left-0 w-1 h-6 text-emerald-500 rounded-r-full" />
+                  <div className="absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full" />
                 )}
-
                 <item.icon className={cn(
                   "text-xl min-w-[20px] transition-transform group-hover:scale-110",
-                  isActive ? "text-emerald-500" : "text-slate-400 text-emerald-500"
+                  isActive ? "text-emerald-500" : "text-slate-400 group-hover:text-emerald-500"
                 )} />
-
                 {!isCollapsed && (
                   <div className="ml-3 flex items-center justify-between w-full">
                     <span className={cn(
@@ -86,29 +127,31 @@ export const Sidebar = () => {
                     </span>
                   </div>
                 )}
-
-                {/* Tooltip for Collapsed State */}
-                {isCollapsed && (
-                  <div className="absolute left-16 bg-slate-800 text-white text-xs py-1.5 px-3 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[100]">
-                    {item.label}
-                  </div>
-                )}
               </div>
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer / User Profile Summary (Optional) */}
-      {!isCollapsed && (
+      {/* Footer Section - Image logic improved */}
+      {!isCollapsed && userInfo && (
         <div className="p-4 border-t border-slate-50 bg-slate-50/30">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center font-bold text-xs">
-              HS
+            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center font-bold text-xs border-2 border-white shadow-sm overflow-hidden flex-shrink-0">
+              {/* Added key={userInfo.avatar} to force re-render when image changes */}
+              <img 
+                key={userInfo?.avatar}
+                src={getAvatarUrl(userInfo?.avatar, userInfo?.name)} 
+                alt="Profile" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${userInfo?.name || 'User'}&background=10b981&color=fff`;
+                }}
+              />
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-800 truncate">Hamza Shahid</p>
-              <p className="text-[10px] text-slate-400 truncate">Admin Account</p>
+              <p className="text-xs font-bold text-slate-800 truncate">{userInfo.name || 'User'}</p>
+              <p className="text-[10px] text-slate-400 truncate">{userInfo.role?.role_name || userInfo.role || 'User'}</p>
             </div>
           </div>
         </div>
