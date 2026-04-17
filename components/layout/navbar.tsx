@@ -13,7 +13,6 @@ export const Navbar = () => {
   const [isClient, setIsClient] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(null);
 
-  // Function to load user data
   const loadUserData = () => {
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('user');
@@ -31,7 +30,6 @@ export const Navbar = () => {
     setIsClient(true);
     loadUserData();
 
-    // Listen for storage changes and custom userUpdated event
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', loadUserData);
       window.addEventListener('userUpdated', loadUserData);
@@ -45,20 +43,19 @@ export const Navbar = () => {
 
   const handleLogout = async () => {
     await AuthService.logout();
-    router.push('/login');
+    router.push('/home');
   };
 
-  // Only render interactive content after hydration
   if (!isClient) {
     return (
       <header className="h-[70px] bg-white border-b border-gray-200 flex items-center justify-end px-8 sticky top-0 z-[100]">
         <div className="flex items-center gap-5">
-          <button className="text-gray-500 hover:text-emerald-500 transition-colors" disabled>
+          <button className="text-gray-500 hover:text-[#6dc6fe] transition-colors" disabled>
             <FiMoon size={20} />
           </button>
-          <button className="p-2 rounded-full text-gray-500" disabled>
+          <button className="p-2 rounded-full text-gray-500 relative" disabled>
             <FiBell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#21a9ff] rounded-full border-2 border-white"></span>
           </button>
         </div>
       </header>
@@ -67,37 +64,35 @@ export const Navbar = () => {
 
   return (
     <header className="h-[70px] bg-white border-b border-gray-200 flex items-center justify-end px-8 sticky top-0 z-[100]">
-
-      {/* Right Icons */}
       <div className="flex items-center gap-5">
-        <button className="text-gray-500 hover:text-emerald-500 transition-colors">
+        <button className="text-gray-500 hover:text-[#6dc6fe] transition-colors">
           <FiMoon size={20} />
         </button>
         
-        {/* --- Notification Bell & Dropdown --- */}
+        {/* --- Notification Bell --- */}
         <div className="relative">
           <button 
             onClick={() => {
                 setIsNotifyOpen(!isNotifyOpen);
-                setProfileInfo(false); // Doosra dropdown band karne ke liye
+                setProfileInfo(false);
             }}
-            className={`p-2 rounded-full transition-colors relative ${isNotifyOpen ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500 hover:bg-gray-50'}`}
+            // Changed emerald-50 to blue-50 and emerald-600 to #21a9ff
+            className={`p-2 rounded-full transition-colors relative ${isNotifyOpen ? 'bg-blue-50 text-[#21a9ff]' : 'text-gray-500 hover:bg-gray-50'}`}
           >
             <FiBell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#21a9ff] rounded-full border-2 border-white"></span>
           </button>
 
           {isNotifyOpen && (
             <div className="absolute top-full right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-white sticky top-0">
                   <h4 className="font-bold text-slate-800">Notifications</h4>
-                  <button className="text-gray-400 hover:text-emerald-500"><FiSettings size={16}/></button>
+                  <button className="text-gray-400 hover:text-[#6dc6fe]"><FiSettings size={16}/></button>
                </div>
                
                <div className="max-h-[400px] overflow-y-auto">
-                  {/* Notification Item */}
                   <div className="p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer flex gap-3 transition-colors">
-                     <div className="w-10 h-10 rounded-full bg-pink-100 flex-shrink-0 flex items-center justify-center text-pink-600 font-bold">SW</div>
+                     <div className="w-10 h-10 rounded-full bg-[#21a9ff] flex-shrink-0 flex items-center justify-center text-[#fff] font-bold">SW</div>
                      <div className="space-y-1">
                         <p className="text-xs text-slate-700 font-medium leading-snug">
                             Application of <span className="font-bold">Sarah Williams</span> is waiting for your approval
@@ -108,7 +103,7 @@ export const Navbar = () => {
                </div>
 
                <div className="p-3 text-center border-t border-gray-50">
-                  <button className="text-xs font-bold text-emerald-600 hover:text-emerald-700">View all notifications</button>
+                  <button className="text-xs font-bold text-[#21a9ff] hover:text-[#6dc6fe]">View all notifications</button>
                </div>
             </div>
           )}
@@ -120,11 +115,12 @@ export const Navbar = () => {
           <button 
             onClick={() => {
                 setProfileInfo(!profileInfo);
-                setIsNotifyOpen(false); // Notification band karne ke liye
+                setIsNotifyOpen(false);
             }}
             className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div className="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
+            {/* Changed bg-emerald-500 to bg-[#21a9ff] */}
+            <div className="w-9 h-9 rounded-full bg-[#21a9ff] flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
               <img src={getAvatarUrl(userInfo?.avatar, userInfo?.name)} alt="Profile" className="w-full h-full object-cover" />
             </div>
             <div className="hidden md:block text-left">
@@ -140,14 +136,15 @@ export const Navbar = () => {
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Welcome</p>
                </div>
                
-               <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+               {/* Hover effects changed from emerald to blue-50 and text-[#21a9ff] */}
+               <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-blue-50 hover:text-[#21a9ff] transition-colors">
                   <FiUser size={18} />
                   <Link href="/user/profile">
                   My Profile
                   </Link>
                </button>
                
-               <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+               <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-blue-50 hover:text-[#21a9ff] transition-colors">
                   <FiSettings size={18} />
                   <span>Settings</span>
                </button>

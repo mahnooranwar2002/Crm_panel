@@ -9,8 +9,9 @@ const normalizeApiUrl = (rawUrl: string | undefined, fallback: string) => {
   return fallback;
 };
 
-// const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'https://crmbackend-tan.vercel.app/api');
-const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'http://localhost:5000/api');
+// const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'https://crmbackend-flame.vercel.app');
+const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'https://crmbackend-flame.vercel.app');
+// const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'http://localhost:5000/api');
 
 export async function apiRequest(endpoint: any, options: RequestInit = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -19,15 +20,14 @@ export async function apiRequest(endpoint: any, options: RequestInit = {}) {
     ...(options.headers as Record<string, string> || {}),
   };
 
-  // Add token if available
-  // const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-    console.log('📤 Auth token present, sending request to:', endpoint);
-  } else {
-    console.warn('⚠️ No auth token found in localStorage');
-  }
+  // Removed authentication token requirement for easy access
+  // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // if (token) {
+  //   headers.Authorization = `Bearer ${token}`;
+  //   console.log('📤 Auth token present, sending request to:', endpoint);
+  // } else {
+  //   console.warn('⚠️ No auth token found in localStorage');
+  // }
 
   const response = await fetch(url, {
     ...options,
@@ -47,10 +47,10 @@ const token = typeof window !== 'undefined' ? localStorage.getItem('token') : nu
         console.error('📋 Full error response:', errorData);
       } else if (response.status === 401) {
         console.error('❌ Unauthorized (401):', errorMessage);
-        // Clear invalid token
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('token');
-        }
+        // Removed token clearing for easy access
+        // if (typeof window !== 'undefined') {
+        //   localStorage.removeItem('token');
+        // }
       }
     } catch (parseError) {
       console.error('Could not parse error response:', parseError);
