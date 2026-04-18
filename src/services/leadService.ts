@@ -25,9 +25,9 @@ export const LeadService = {
   },
 
   async updateLead(id: string, leadData: any) {
-    // Using PATCH as per your previous CORS discussion
+
     const response = await apiRequest(`/leads/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(leadData),
     });
     return response.data;
