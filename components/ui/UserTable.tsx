@@ -2,47 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiEye, FiEdit2, FiTrash2, FiMail, FiPlus, FiX, FiPhone, FiCamera, FiShield } from "react-icons/fi";
 import { UserService } from "@/src/services/userService";
-<<<<<<< HEAD
-// import { RoleService } from "@/src/services/roleService";
-import { UploadService } from "@/src/services/uploadService";
-import { getAvatarUrl, getInitials } from "@/src/utils/avatarHelper";
-
-// --- Fallback Data ---
-const FALLBACK_USERS = [
-  {
-    _id: "507f1f77bcf86cd799439012",
-    name: "Ahmed Ali",
-    email: "ahmed@example.com",
-    phone: "+923001234567",
-    role: { role_name: "Manager" },
-    status: "INACTIVE",
-    avatar: null,
-  }
-];
-
-interface User {
-  _id?: string;
-  id?: string;
-  name: string;
-  role?: any;
-  status: string;
-  email: string;
-  phone?: string;
-  avatar?: any;
-}
-
-const emptyUser: User = {
-  name: "",
-  status: "ACTIVE",
-  email: "",
-  phone: "",
-  role: "",
-  avatar: null,
-};
-=======
 import { RoleService } from "@/src/services/roleService";
 import { getAvatarUrl } from "@/src/utils/avatarHelper";
->>>>>>> origin/commandline
 
 export const UserTable = () => {
   const [userData, setUserData] = useState<any[]>([]);
@@ -74,16 +35,12 @@ export const UserTable = () => {
   };
 
   const fetchRoles = async () => {
-<<<<<<< HEAD
-
-=======
     try {
       const response = await RoleService.getRoles(1, 100);
       setRoles(response?.data?.roles || response?.roles || []);
     } catch (err) {
       console.error("Roles fetch error");
     }
->>>>>>> origin/commandline
   };
 
   const handleAddUser = async () => {
