@@ -1,98 +1,54 @@
-import { apiRequest } from '../api/client';
-import { handleApiError } from '../utils/errorHandler';
+const DEFAULT_USER = {
+  _id: 'user-static-1',
+  name: 'Demo User',
+  email: 'demo@example.com',
+  phone: '+923001234567',
+  role: { role_name: 'Admin' },
+  avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=10b981&color=fff',
+};
+
+const STATIC_ROLES = [
+  { _id: 'admin', role_name: 'Admin' },
+  { _id: 'manager', role_name: 'Manager' },
+  { _id: 'sales', role_name: 'Sales' },
+];
+
+const saveUser = (user: any) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', 'static-token');
+  }
+};
 
 export const AuthService = {
   async signup(data: { name: string; email: string; password: string; phone?: string; role: string; avatar?: string | null }) {
-    try {
-      console.log('📝 Signup attempt with data:', { ...data, password: '***' });
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+    const user = {
+      ...DEFAULT_USER,
+      _id: `user-${Date.now()}`,
+      name: data.name || DEFAULT_USER.name,
+      email: data.email || DEFAULT_USER.email,
+      phone: data.phone || DEFAULT_USER.phone,
+      role: { role_name: data.role || DEFAULT_USER.role.role_name },
+      avatar: data.avatar || DEFAULT_USER.avatar,
+    };
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('❌ Signup failed:', error);
-        throw new Error(error.message || 'Signup failed');
-      }
-
-      const result = await response.json();
-      const { token, user } = result.data;
-
-      if (token && user) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        console.log('✅ User signed up successfully:', {
-          email: user.email,
-          role: user.role?.role_name || user.role || 'NO_ROLE',
-        });
-      }
-
-      return { token, user };
-    } catch (error: any) {
-      console.error('Signup error:', error);
-      throw error;
-    }
+    saveUser(user);
+    return { token: 'static-token', user };
   },
 
   async login(email: string, password: string) {
-    try {
-      console.log('🔐 Login attempt for:', email);
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    const user = {
+      ...DEFAULT_USER,
+      email: email || DEFAULT_USER.email,
+      role: { role_name: 'Admin' },
+    };
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('❌ Login failed:', error);
-        throw new Error(error.message || 'Login failed');
-      }
-
-      const result = await response.json();
-      const { token, user } = result.data;
-
-      if (token && user) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        console.log('✅ User logged in successfully:', {
-          email: user.email,
-          role: user.role?.role_name || user.role || 'NO_ROLE',
-          userId: user._id,
-        });
-        console.log('📦 User object stored:', user);
-      }
-
-      return { token, user };
-    } catch (error: any) {
-      console.error('Login error:', error);
-      throw error;
-    }
+    saveUser(user);
+    return { token: 'static-token', user };
   },
 
   async getAvailableRoles() {
-    try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_BASE_URL}/auth/roles`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch roles');
-      }
-
-      const result = await response.json();
-      return result.data || [];
-    } catch (error: any) {
-      console.error('Error fetching roles:', error);
-      return [];
-    }
+    return STATIC_ROLES;
   },
 
   async logout() {
@@ -103,39 +59,33 @@ export const AuthService = {
   },
 
   isAuthenticated() {
-    if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('token');
+    return true;
   },
 
   getToken() {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+      return localStorage.getItem('token') || 'static-token';
     }
-    return null;
+    return 'static-token';
   },
 
   getUser() {
     if (typeof window !== 'undefined') {
       const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null;
+      return user ? JSON.parse(user) : DEFAULT_USER;
     }
-    return null;
+    return DEFAULT_USER;
   },
 
   setAuthData(token: string, user: any) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
     }
   },
 
-  async getCurrentUser() {
-    try {
-      const response = await apiRequest('/auth/me');
-      return response.user || response;
-    } catch (error: any) {
-      throw new Error(handleApiError(error));
-    }
+  async getCurrentUser(): Promise<any> {
+    return { user: this.getUser() };
   },
 };
 

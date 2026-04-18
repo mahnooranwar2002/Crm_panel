@@ -53,7 +53,7 @@ export const CompaniesTable = () => {
 
   const fetchUserRole = async () => {
     try {
-      const currentUser = await AuthService.getCurrentUser();
+      const currentUser = (await AuthService.getCurrentUser()) as { user?: any; data?: any } | any;
       const userData = currentUser?.user || currentUser?.data || currentUser;
 
       let role = '';
@@ -226,7 +226,7 @@ export const CompaniesTable = () => {
               website: '',
               address: '',
             })}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg transition-all"
+            className="flex items-center gap-2 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all"
           >
             <FiPlus /> Add Company
           </button>
@@ -248,20 +248,6 @@ export const CompaniesTable = () => {
           <p className="text-rose-700 text-sm">Error: {error}</p>
         </div>
       )}
-
-      {/* Search Bar */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-md p-4">
-        <div className="relative">
-          <FiSearch className="absolute left-4 top-3.5 text-slate-400" size={18} />
-          <input
-            type="text"
-            placeholder="Search companies by name or industry..."
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-          />
-        </div>
-      </div>
 
       {/* Table */}
       <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden">
@@ -378,7 +364,7 @@ export const CompaniesTable = () => {
           <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-black text-slate-800">
-                {addingCompany ? '📝 Create New Company' : editingCompany ? '✏️ Edit Company' : '👁️ Company Details'}
+                {addingCompany ? 'Create New Company' : editingCompany ? 'Edit Company' : 'Company Details'}
               </h2>
               <button
                 onClick={() => {

@@ -21,10 +21,9 @@ export const ProfileTable = () => {
     const fetchUserProfile = async () => {
         try {
             setLoading(true);
-            const userProfile = await AuthService.getCurrentUser();
+            const userProfile = (await AuthService.getCurrentUser()) as any;
             const finalData = userProfile?.user || userProfile?.data || userProfile;
             
-            // Cache busting for fresh load
             if (finalData?.avatar && typeof finalData.avatar === 'string') {
                 finalData.avatar = `${finalData.avatar.split('?')[0]}?t=${Date.now()}`;
             }
@@ -70,7 +69,6 @@ export const ProfileTable = () => {
                 const response = await UserService.updateUser(userId, updatedData);
                 let savedData = response?.user || response?.data || updatedData;
                 
-                // Cache busting after upload
                 if (savedData.avatar && typeof savedData.avatar === 'string' && !savedData.avatar.startsWith('data:')) {
                     savedData.avatar = `${savedData.avatar.split('?')[0]}?t=${Date.now()}`;
                 }
@@ -95,8 +93,6 @@ export const ProfileTable = () => {
 
     if (loading) return <div className="p-10 text-center font-bold text-slate-500">Loading Profile...</div>;
 
-    // --- FIX FOR IMAGE DISPLAY ---
-    // Agar avatar null hai ya undefined, toh hum initials wala fallback use karenge
     const profileImageUrl = userData?.avatar ? getAvatarUrl(userData.avatar, userData.name) : undefined;
 
     return (
@@ -105,8 +101,8 @@ export const ProfileTable = () => {
             {/* Header Section */}
             <div className="bg-white rounded-md border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    {/* Circle Image Container */}
-                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg bg-emerald-600 flex items-center justify-center text-white text-3xl font-bold shrink-0">
+                    {/* Updated emerald-600 to #21a9ff */}
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg bg-[#21a9ff] flex items-center justify-center text-white text-3xl font-bold shrink-0">
                         {userData?.avatar ? (
                             <Image
                                 key={userData?.avatar}
@@ -117,19 +113,19 @@ export const ProfileTable = () => {
                                 unoptimized={true}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                    // Agar backend link fail ho jaye toh UI-Avatar dikhaye
-                                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${userData?.name}&background=059669&color=fff`;
+                                    // Updated emerald to #21a9ff in fallback
+                                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${userData?.name}&background=21a9ff&color=fff`;
                                 }}
                             />
                         ) : (
-                            // Agar image hai hi nahi toh initials dikhaye
                             <span className="uppercase">{userData?.name?.substring(0, 2) || 'JD'}</span>
                         )}
                     </div>
                     <div>
                         <h3 className="text-2xl font-bold text-slate-900 capitalize">{userData?.name || 'User Name'}</h3>
                         <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <span className="text-emerald-600 font-bold uppercase tracking-wider text-xs">{getRoleName(userData?.role)}</span>
+                            {/* Updated emerald-600 to #21a9ff */}
+                            <span className="text-[#21a9ff] font-bold uppercase tracking-wider text-xs">{getRoleName(userData?.role)}</span>
                             <span className="text-slate-300">|</span>
                             <span className="flex items-center gap-1"><FiMapPin size={12}/> {userData?.location || 'Location Not Set'}</span>
                         </p>
@@ -147,7 +143,8 @@ export const ProfileTable = () => {
             {/* Information Grid */}
             <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
-                    <FiUser className="text-emerald-500" />
+                    {/* Updated text-emerald-500 to #21a9ff */}
+                    <FiUser className="text-[#21a9ff]" />
                     <h3 className="font-bold text-slate-700 uppercase tracking-widest text-xs">Account Information</h3>
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12">
@@ -171,7 +168,8 @@ export const ProfileTable = () => {
                         
                         <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
                             <div className="flex flex-col items-center mb-4">
-                                <div className="relative group w-20 h-20 rounded-full overflow-hidden border-2 border-emerald-500 shadow-md bg-slate-100 flex items-center justify-center">
+                                {/* Updated border-emerald-500 to #21a9ff */}
+                                <div className="relative group w-20 h-20 rounded-full overflow-hidden border-2 border-[#21a9ff] shadow-md bg-slate-100 flex items-center justify-center">
                                     {editingUser.avatar ? (
                                         <img 
                                             key={editingUser.avatar}
@@ -180,7 +178,7 @@ export const ProfileTable = () => {
                                             className="w-full h-full object-cover" 
                                         />
                                     ) : (
-                                        <span className="text-emerald-600 font-bold uppercase">{editingUser.name?.substring(0, 2)}</span>
+                                        <span className="text-[#21a9ff] font-bold uppercase">{editingUser.name?.substring(0, 2)}</span>
                                     )}
                                     <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
                                         <FiCamera className="text-white" size={24} />
@@ -198,10 +196,11 @@ export const ProfileTable = () => {
                             </div>
                         </div>
 
+                        {/* Updated bg-emerald-600 to #21a9ff */}
                         <button 
                             type="submit" 
                             disabled={uploading}
-                            className="w-full py-3 bg-emerald-600 text-white rounded-lg font-bold shadow-lg hover:bg-emerald-700 active:scale-[0.98] transition-all mt-4 disabled:opacity-70"
+                            className="w-full py-3 bg-[#21a9ff] text-white rounded-lg font-bold shadow-lg hover:bg-[#1a8cd6] active:scale-[0.98] transition-all mt-4 disabled:opacity-70"
                         >
                             {uploading ? 'Saving Changes...' : 'Save Profile Data'}
                         </button>
@@ -215,7 +214,7 @@ export const ProfileTable = () => {
 const InfoField = ({ label, value, isHighlight = false }: { label: string, value: string, isHighlight?: boolean }) => (
     <div className="space-y-1">
         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</label>
-        <p className={`text-base font-bold ${isHighlight ? 'text-emerald-600' : 'text-slate-900'}`}>
+        <p className={`text-base font-bold ${isHighlight ? 'text-[#21a9ff]' : 'text-slate-900'}`}>
             {value || 'Not Provided'}
         </p>
     </div>
@@ -224,8 +223,9 @@ const InfoField = ({ label, value, isHighlight = false }: { label: string, value
 const EditInput = ({ label, value, onChange, placeholder = "" }: any) => (
     <div className="space-y-1">
         <label className="text-[10px] font-bold text-slate-400 uppercase">{label}</label>
+        {/* Updated focus colors to #21a9ff */}
         <input 
-            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm" 
+            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#21a9ff]/20 focus:border-[#21a9ff] outline-none transition-all text-sm" 
             value={value || ''} 
             placeholder={placeholder}
             onChange={(e) => onChange(e.target.value)} 

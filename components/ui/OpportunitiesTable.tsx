@@ -101,7 +101,7 @@ export const OpportunitiesTable = () => {
           <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Opportunities</h1>
           <p className="text-sm text-slate-500 mt-1 font-bold uppercase tracking-wider">Full Pipeline Tracker</p>
         </div>
-        <button onClick={() => openModal('create')} className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg active:scale-95">
+        <button onClick={() => openModal('create')} className="flex items-center justify-center gap-2 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg active:scale-95">
           <FiPlus size={18} />
           <span>New Opportunity</span>
         </button>
