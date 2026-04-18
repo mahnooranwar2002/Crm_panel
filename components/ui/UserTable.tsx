@@ -13,12 +13,22 @@ import {
   FiShield,
 } from "react-icons/fi";
 import { UserService } from "@/src/services/userService";
-import { RoleService } from "@/src/services/roleService";
+// import { RoleService } from "@/src/services/roleService";
 import { UploadService } from "@/src/services/uploadService";
 import { getAvatarUrl, getInitials } from "@/src/utils/avatarHelper";
 
 // --- Fallback Data ---
-
+const FALLBACK_USERS = [
+  {
+    _id: "507f1f77bcf86cd799439012",
+    name: "Ahmed Ali",
+    email: "ahmed@example.com",
+    phone: "+923001234567",
+    role: { role_name: "Manager" },
+    status: "INACTIVE",
+    avatar: null,
+  }
+];
 
 interface User {
   _id?: string;
@@ -62,12 +72,11 @@ export const UserTable = () => {
     try {
       setLoading(true);
       const data = await UserService.getUsers(1, 100);
-      setUserData(data?.users?.length ? data.users :"abc");
-      console.log("Fetched Users:", );
+      setUserData(data?.users?.length ? data.users : FALLBACK_USERS);
       setError(null);
     } catch (err: any) {
       console.error("Using Fallback Data due to error:", err);
-   
+      setUserData(FALLBACK_USERS);
       setError("Note: Showing fallback data (Backend unreachable)");
     } finally {
       setLoading(false);
@@ -75,12 +84,7 @@ export const UserTable = () => {
   };
 
   const fetchRoles = async () => {
-    try {
-      const data = await RoleService.getRoles(1, 100);
-      setRoles(data?.roles || [{ _id: "admin", role_name: "Admin" }, { _id: "manager", role_name: "Manager" }, { _id: "sales", role_name: "Sales" }]);
-    } catch (err) {
-      setRoles([{ _id: "admin", role_name: "Admin" }, { _id: "manager", role_name: "Manager" }, { _id: "sales", role_name: "Sales" }]);
-    }
+
   };
 
   // Image Handling
