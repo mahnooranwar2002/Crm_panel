@@ -25,7 +25,10 @@ export const LeadService = {
   },
 
   async updateLead(id: string, leadData: any) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/commandline
     const response = await apiRequest(`/leads/${id}`, {
       method: 'PUT',
       body: JSON.stringify(leadData),
