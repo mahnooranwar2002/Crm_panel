@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit3, FiTrash2, FiPlus, FiLock, FiSettings, FiX } from 'react-icons/fi';
 import { RoleService } from '@/src/services/roleService';
+import toast, { Toaster } from 'react-hot-toast';
 
 const RolesTable = () => {
   const [roles, setRoles] = useState<any[]>([]);
@@ -50,21 +51,24 @@ const RolesTable = () => {
 
   const handleCreateRole = async (e: React.FormEvent) => {
     e.preventDefault();
+    const loadToast = toast.loading("Creating new role..."); // Loading start
     try {
       await RoleService.createRole({ 
         role_name: newRoleName, 
         status: parseInt(newRoleStatus),
         permissions: newRolePermissions 
       });
+      
+      toast.success("Role created successfully!", { id: loadToast }); // Success
       setIsModalOpen(false);
       setNewRoleName('');
       setNewRoleStatus('1');
       setNewRolePermissions([]);
       fetchRoles();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message || "Failed to create role", { id: loadToast }); // Error
     }
-  };
+};
 
   const handleEditRole = (role: any) => {
     setEditingRole(role);
@@ -76,33 +80,37 @@ const RolesTable = () => {
 
   const handleUpdateRole = async (e: React.FormEvent) => {
     e.preventDefault();
+    const loadToast = toast.loading("Updating role settings...");
     try {
       await RoleService.updateRole(editingRole._id, { 
         role_name: editRoleName, 
         status: parseInt(editRoleStatus),
         permissions: editRolePermissions 
       });
+
+      toast.success("Role updated successfully! ✨", { id: loadToast });
       setIsEditModalOpen(false);
       setEditingRole(null);
       fetchRoles();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message || "Update failed", { id: loadToast });
     }
-  };
+};
 
   const handleDeleteRole = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this role?')) {
       try {
         await RoleService.deleteRole(id);
+        toast.success("Role deleted successfully");
         fetchRoles();
       } catch (err: any) {
-        alert('Error: ' + err.message);
+        toast.error("Error: " + err.message);
       }
     }
-  };
+};
 
   return (
-    <div className="w-full space-y-6 animate-in slide-in-from-bottom-4 duration-500 relative">
+    <div className="w-full text-black space-y-6 animate-in slide-in-from-bottom-4 duration-500 relative">
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
         <div>
@@ -177,7 +185,7 @@ const RolesTable = () => {
                       </div>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-2 transition-opacity">
                         <button onClick={() => handleEditRole(role)} className="p-2.5 text-slate-400 hover:text-[#21a9ff] hover:bg-white rounded-xl transition-all hover:shadow-md border border-transparent hover:border-slate-100">
                           <FiSettings size={18} />
                         </button>
@@ -261,7 +269,7 @@ const RolesTable = () => {
           </div>
         </div>
       )}
-
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };

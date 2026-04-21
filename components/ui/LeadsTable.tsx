@@ -11,6 +11,7 @@ import {
   FiCheckCircle,
 } from "react-icons/fi";
 import { LeadService } from "@/src/services/leadService";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Lead {
   _id?: string;
@@ -74,51 +75,63 @@ export const LeadsTable = () => {
 
   const handleAddLead = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Field validation with toast
     if (!addingLead?.firstName || !addingLead?.email) {
-      alert("Please fill required fields (First Name & Email)");
+      toast.error("Please fill required fields (First Name & Email)");
       return;
     }
+
+    const loadToast = toast.loading("Saving new lead...");
     try {
       const createdLead = await LeadService.createLead(addingLead);
       setLeads((prev) => [createdLead, ...prev]);
       setAddingLead(null);
-      alert("Lead created successfully");
+      
+      toast.success("Lead created successfully! 🎯", { id: loadToast });
       fetchLeads();
     } catch (err: any) {
-      alert("Error: " + err.message);
+      toast.error("Error: " + err.message, { id: loadToast });
     }
-  };
+};
 
-  const handleEditLead = async (e: React.FormEvent) => {
+ const handleEditLead = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!editingLead?._id || !editingLead?.firstName || !editingLead?.email) {
-      alert("Please fill required fields");
+      toast.error("Please fill required fields");
       return;
     }
+
+    const loadToast = toast.loading("Updating lead details...");
     try {
       await LeadService.updateLead(editingLead._id, editingLead);
       setLeads((prev) =>
         prev.map((lead) => (lead._id === editingLead._id ? editingLead : lead))
       );
       setEditingLead(null);
-      alert("Lead updated successfully");
+      
+      toast.success("Lead updated successfully", { id: loadToast });
       fetchLeads();
     } catch (err: any) {
-      alert("Error: " + err.message);
+      toast.error("Error: " + err.message, { id: loadToast });
     }
-  };
+};
 
   const handleDeleteLead = async (id: string) => {
+    // Confirm dialogue browser ka hi rehne dein (safe option)
     if (confirm("Are you sure you want to delete this lead?")) {
+      const loadToast = toast.loading("Removing lead...");
       try {
         await LeadService.deleteLead(id);
         setLeads((prev) => prev.filter((lead) => lead._id !== id));
-        alert("Lead deleted successfully");
+        
+        toast.success("Lead deleted successfully", { id: loadToast });
       } catch (err: any) {
-        alert("Error: " + err.message);
+        toast.error("Error: " + err.message, { id: loadToast });
       }
     }
-  };
+};
 
   const getStatusColor = (status: string) => STATUS_COLORS[status] || STATUS_COLORS["New"];
 
@@ -459,6 +472,7 @@ export const LeadsTable = () => {
           </div>
         </div>
       )}
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };

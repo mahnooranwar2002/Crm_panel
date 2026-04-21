@@ -1,16 +1,13 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { FiEye, FiEdit2, FiTrash2, FiPlus, FiX, FiBriefcase, FiGlobe, FiMapPin, FiUser, FiAlertCircle, FiSearch } from 'react-icons/fi';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  FiEye, FiEdit2, FiTrash2, FiPlus, FiX, 
+  FiBriefcase, FiGlobe, FiMapPin, FiSearch, FiLoader
+} from 'react-icons/fi';
 import { CompanyService } from '@/src/services/companyService';
-import { AuthService } from '@/src/services/authService';
 import { UserService } from '@/src/services/userService';
-
-const STATUS_COLORS: any = {
-  New: 'bg-blue-100 text-blue-700 ring-blue-500/20',
-  Contacted: 'bg-amber-100 text-amber-700 ring-amber-500/20',
-  Qualified: 'bg-purple-100 text-purple-700 ring-purple-500/20',
-  Lost: 'bg-rose-100 text-rose-700 ring-rose-500/20',
-};
+import { AuthService } from '@/src/services/authService';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Company {
   _id?: string;
@@ -21,78 +18,84 @@ interface Company {
   address: string;
 }
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role?: any;
-}
-
-export const CompaniesTable = () => {
+const CompaniesTable = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [users, setUsers] = useState<any[]>([]);
+  const [userRole, setUserRole] = useState('');
+  
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [addingCompany, setAddingCompany] = useState<Company | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [userRole, setUserRole] = useState('');
-  const [roleLoaded, setRoleLoaded] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [successMessage, setSuccessMessage] = useState('');
+
+  const PRIMARY_COLOR = "#21a9ff";
+  const SECONDARY_COLOR = "#6dc6fe";
 
   useEffect(() => {
-    const initializeData = async () => {
-      await fetchUserRole();
+    const init = async () => {
+      setLoading(true);
+      await Promise.all([fetchUserRole(), fetchCompanies(), fetchUsers()]);
+      setLoading(false);
     };
-    initializeData();
-    fetchCompanies();
-    fetchUsers();
+    init();
   }, []);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm || searchTerm === '') {
+        fetchCompanies(searchTerm);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchUserRole = async () => {
     try {
-      const currentUser = (await AuthService.getCurrentUser()) as { user?: any; data?: any } | any;
-      const userData = currentUser?.user || currentUser?.data || currentUser;
-
-      let role = '';
-      if (userData?.role) {
-        if (typeof userData.role === 'object' && userData.role?.role_name) {
-          role = userData.role.role_name.trim();
-        } else if (typeof userData.role === 'string') {
-          role = userData.role.trim();
-        }
-      }
-
-      console.log('fetchUserRole - Extracted role:', role);
-      setUserRole(role);
-      setRoleLoaded(true);
-    } catch (err: any) {
-      console.warn('Failed to fetch role from backend, using localStorage:', err.message);
-      const user = AuthService.getUser();
-      let role = '';
-      if (user?.role) {
-        if (typeof user.role === 'object' && user.role?.role_name) {
-          role = user.role.role_name.trim();
-        } else if (typeof user.role === 'string') {
-          role = user.role.trim();
-        }
-      }
-      setUserRole(role);
-      setRoleLoaded(true);
+      const res = await AuthService.getCurrentUser();
+      const role = res?.role?.role_name || res?.role || res?.data?.role || '';
+      console.log("Current User Role:", role);
+      setUserRole(role.toString().toLowerCase().trim());
+    } catch (err) {
+      console.error("Role fetch error", err);
     }
   };
 
-  const fetchCompanies = async (page: number = 1, search: string = '') => {
+  const fetchCompanies = async (search = '') => {
     try {
       setLoading(true);
-      const data = await CompanyService.getCompanies(page, 100, search);
-      setCompanies(data?.companies || []);
-      setError(null);
+      const res = await CompanyService.getCompanies(1, 100, search);
+
+      // Extract companies from response structure: { statusCode, data: { companies/result/...}, message, success }
+      let data = [];
+      if (Array.isArray(res)) {
+        data = res;
+      } else if (res?.data && Array.isArray(res.data)) {
+        data = res.data;
+      } else if (res?.data?.companies && Array.isArray(res.data.companies)) {
+        data = res.data.companies;
+      } else if (res?.data?.result && Array.isArray(res.data.result)) {
+        data = res.data.result;
+      } else if (res?.companies && Array.isArray(res.companies)) {
+        data = res.companies;
+      }
+
+      console.log("✅ Companies fetched:", data);
+      setCompanies(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      console.error('Error fetching companies:', err);
-      setError(err.message);
+      console.error("❌ Error fetching companies:", err);
+
+      // Handle specific mongoose model errors
+      if (err.message && err.message.includes("Schema hasn't been registered for model")) {
+        console.warn("⚠️ Backend mongoose model issue detected. This is a server-side issue that needs to be fixed.");
+        toast.error("Server configuration error. Please contact administrator.");
+      } else {
+        toast.error("Failed to fetch companies");
+      }
+
+      setCompanies([]);
     } finally {
       setLoading(false);
     }
@@ -100,448 +103,366 @@ export const CompaniesTable = () => {
 
   const fetchUsers = async () => {
     try {
-      const data = await UserService.getUsers(100);
-      setUsers(data?.users || []);
-    } catch (err: any) {
-      console.error('Error fetching users:', err);
-    }
-  };
+      const res = await UserService.getUsers(1, 100);
 
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-    fetchCompanies(1, value);
-  };
-
-  const createCompany = async () => {
-    if (!addingCompany?.name || !addingCompany?.industry) {
-      alert('Please fill required fields (Name and Industry)');
-      return;
-    }
-
-    if (!canCreateCompany) {
-      alert('Access denied. Only Admin and Manager can create companies.');
-      setAddingCompany(null);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await CompanyService.createCompany({
-        name: addingCompany.name,
-        industry: addingCompany.industry,
-        website: addingCompany.website || '',
-        address: addingCompany.address || '',
-        owner_id: addingCompany.owner_id?._id || '',
-      });
-
-      setSuccessMessage('Company created successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
-      setAddingCompany(null);
-      fetchCompanies(currentPage, searchTerm);
-    } catch (err: any) {
-      const errorMsg = err.message || 'Unknown error occurred';
-      if (errorMsg.includes('Access denied')) {
-        alert('Access denied. Only Admin and Manager can create companies.');
-      } else {
-        alert('Error: ' + errorMsg);
+      // Extract users from response structure: { statusCode, data: { users }, message, success }
+      let userData = [];
+      if (Array.isArray(res)) {
+        userData = res;
+      } else if (res?.data?.users && Array.isArray(res.data.users)) {
+        userData = res.data.users;
+      } else if (res?.data && Array.isArray(res.data)) {
+        userData = res.data;
+      } else if (res?.users && Array.isArray(res.users)) {
+        userData = res.users;
       }
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const updateCompany = async () => {
-    if (!editingCompany?._id || !editingCompany?.name || !editingCompany?.industry) {
-      alert('Please fill required fields');
-      return;
-    }
+      console.log("✅ Users fetched:", userData);
+      setUsers(Array.isArray(userData) ? userData : []);
+    } catch (err) {
+      console.error("❌ Users fetch error:", err);
 
-    try {
-      setLoading(true);
-      await CompanyService.updateCompany(editingCompany._id, {
-        name: editingCompany.name,
-        industry: editingCompany.industry,
-        website: editingCompany.website || '',
-        address: editingCompany.address || '',
-        owner_id: editingCompany.owner_id?._id || '',
-      });
-
-      setSuccessMessage('Company updated successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
-      setEditingCompany(null);
-      fetchCompanies(currentPage, searchTerm);
-    } catch (err: any) {
-      alert('Error: ' + (err.message || 'Unknown error occurred'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteCompany = async (id: string) => {
-    if (confirm('Are you sure you want to delete this company?')) {
-      try {
-        if (!canDeleteCompany) {
-          alert('Access denied. Only Admin can delete companies.');
-          return;
-        }
-        await CompanyService.deleteCompany(id);
-        setSuccessMessage('Company deleted successfully!');
-        setTimeout(() => setSuccessMessage(''), 3000);
-        fetchCompanies(currentPage, searchTerm);
-      } catch (err: any) {
-        const errorMsg = err.message || 'Unknown error occurred';
-        if (errorMsg.includes('Access denied')) {
-          alert('Access denied. Only Admin can delete companies.');
-        } else {
-          alert('Error: ' + errorMsg);
-        }
+      // Handle specific mongoose model errors
+      if (err.message && err.message.includes("Schema hasn't been registered for model")) {
+        console.warn("⚠️ Backend mongoose model issue detected. This is a server-side issue that needs to be fixed.");
+        toast.error("Server configuration error. Please contact administrator.");
       }
+
+      setUsers([]);
     }
   };
 
-  const canCreateCompany = userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager';
-  const canEditCompany = userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager';
-  const canDeleteCompany = userRole.toLowerCase() === 'admin';
+  // Buttons visibility logic
+  const canCreate = userRole === 'admin' || userRole === 'manager' || userRole === 'superadmin';
 
-  console.log('CompaniesTable - userRole:', `"${userRole}"`, 'canCreateCompany:', canCreateCompany);
-
-  if (loading && companies.length === 0) {
-    return <div className="text-center py-8">Loading...</div>;
-  }
+  const handleDelete = useCallback(async (companyId: string) => {
+    if (!window.confirm('Are you sure you want to delete this company?')) return;
+    
+    setDeleting(companyId);
+    const loadToast = toast.loading('Deleting...');
+    try {
+      await CompanyService.deleteCompany(companyId);
+      toast.success('Company deleted successfully!', { id: loadToast });
+      setSearchTerm('');
+      await fetchCompanies('');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete company', { id: loadToast });
+    } finally {
+      setDeleting(null);
+    }
+  }, []);
 
   return (
-    <div className="w-full space-y-6 p-6 text-black bg-slate-50 min-h-screen">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full p-4 md:p-8 bg-[#f8fafc] min-h-screen text-slate-800">
+      <Toaster position="top-right" />
+
+      {/* --- Header Section --- */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Companies Management</h1>
-          <p className="text-slate-500 font-medium">Role: <span className="font-bold text-indigo-600">{roleLoaded ? userRole : 'Loading...'}</span></p>
+          <h1 className="text-4xl font-black tracking-tight text-slate-900">Companies</h1>
+          <p className="text-slate-500 font-medium mt-1">Manage business accounts and ownership</p>
         </div>
-        {roleLoaded && canCreateCompany && (
+        
+        {(canCreate || userRole === '') && (
           <button
-            onClick={() => setAddingCompany({
-              name: '',
-              industry: '',
-              website: '',
-              address: '',
-            })}
-            className="flex items-center gap-2 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all"
+            onClick={() => setAddingCompany({ name: '', industry: '', website: '', address: '' })}
+            className="flex items-center justify-center gap-2 text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:scale-105 active:scale-95 transition-all w-full md:w-auto"
+            style={{ backgroundColor: PRIMARY_COLOR }}
           >
-            <FiPlus /> Add Company
+            <FiPlus size={20} /> Add New Company
           </button>
         )}
       </div>
 
-      {/* Success Message */}
-      {successMessage && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3 animate-in fade-in">
-          <div className="text-green-600 mt-0.5 flex-shrink-0">✓</div>
-          <p className="text-green-700 text-sm font-medium">{successMessage}</p>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3">
-          <FiAlertCircle className="text-rose-600 mt-0.5 flex-shrink-0" size={18} />
-          <p className="text-rose-700 text-sm">Error: {error}</p>
-        </div>
-      )}
-
-      {/* Table */}
-      <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-slate-50 text-slate-400 text-[11px] font-black uppercase tracking-widest">
-            <tr>
-              <th className="px-8 py-5">Company Name</th>
-              <th className="px-8 py-5">Industry</th>
-              <th className="px-8 py-5">Website</th>
-              <th className="px-8 py-5">Owner</th>
-              <th className="px-8 py-5">Address</th>
-              <th className="px-8 py-5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {companies.length > 0 ? (
-              companies.map((company) => (
-                <tr key={company._id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-8 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
-                        <FiBriefcase size={16} />
-                      </div>
-                      <p className="font-bold text-slate-800">{company.name}</p>
-                    </div>
-                  </td>
-                  <td className="px-8 py-4">
-                    <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold">
-                      {company.industry}
-                    </span>
-                  </td>
-                  <td className="px-8 py-4">
-                    {company.website ? (
-                      <a
-                        href={company.website.startsWith('http') ? company.website : `https://${company.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
-                      >
-                        <FiGlobe size={14} /> {company.website}
-                      </a>
-                    ) : (
-                      <span className="text-slate-400 text-sm">-</span>
-                    )}
-                  </td>
-                  <td className="px-8 py-4">
-                    <div className="flex items-center gap-2">
-                      <FiUser size={14} className="text-slate-400" />
-                      <span className="text-sm text-slate-600">{company.owner_id?.name || 'Unassigned'}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-4">
-                    <div className="flex items-center gap-2 text-slate-600 text-sm">
-                      <FiMapPin size={14} className="text-slate-400" />
-                      <span className="truncate max-w-xs">{company.address || '-'}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => setSelectedCompany(company)}
-                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                        title="View"
-                      >
-                        <FiEye size={18} />
-                      </button>
-                      {canEditCompany && (
-                        <button
-                          onClick={() => setEditingCompany(company)}
-                          className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                          title="Edit"
-                        >
-                          <FiEdit2 size={18} />
-                        </button>
-                      )}
-                      {canDeleteCompany && (
-                        <button
-                          onClick={() => deleteCompany(company._id || '')}
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                          title="Delete"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-8 py-16 text-center">
-                  <FiBriefcase className="mx-auto text-slate-300 mb-3" size={40} />
-                  <p className="text-slate-500 font-medium">No companies found</p>
-                  {searchTerm && <p className="text-slate-400 text-sm">Try adjusting your search</p>}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* --- Search Bar --- */}
+      <div className="mb-8 relative">
+        <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        <input
+          type="text"
+          placeholder="Search companies by name, industry, or website..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-14 pr-6 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:border-[#21a9ff] focus:outline-none transition-all font-medium text-slate-700"
+        />
       </div>
 
-      {/* Modals */}
-      {(addingCompany || editingCompany || selectedCompany) && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
-            onClick={() => {
-              setAddingCompany(null);
-              setEditingCompany(null);
-              setSelectedCompany(null);
-            }}
-          ></div>
+      {/* --- Table Section --- */}
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-32 gap-3">
+            <FiLoader className="animate-spin" size={32} style={{ color: PRIMARY_COLOR }} />
+            <p className="text-lg font-bold text-slate-600">Loading companies...</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50/50 text-[12px] font-black uppercase tracking-[0.15em] text-slate-400 border-b border-slate-100">
+                  <th className="px-10 py-6">Company Info</th>
+                  <th className="px-10 py-6">Industry</th>
+                  <th className="px-10 py-6">Owner</th>
+                  <th className="px-10 py-6 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 text-slate-600">
+                {companies.length > 0 ? (
+                  companies.map((company) => (
+                    <tr key={company._id} className="hover:bg-blue-50/30 transition-colors group">
+                      <td className="px-10 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-slate-100 rounded-xl group-hover:bg-white transition-colors" style={{ color: PRIMARY_COLOR }}>
+                            <FiBriefcase size={20} />
+                          </div>
+                          <div>
+                            <p className="font-extrabold text-slate-800 text-lg">{company.name}</p>
+                            <p className="text-sm text-slate-400 font-medium">
+                              {company.website || 'No website'}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-10 py-6">
+                        <span className="px-4 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-black uppercase tracking-wider">
+                          {company.industry}
+                        </span>
+                      </td>
+                      <td className="px-10 py-6">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-[#6dc6fe]/20 flex items-center justify-center text-[#21a9ff] font-bold text-xs uppercase">
+                            {(company.owner_id?.name || `${company.owner_id?.firstName || ''} ${company.owner_id?.lastName || ''}` || '?').charAt(0)}
+                          </div>
+                          <p className="text-sm font-bold text-slate-700">
+                            {company.owner_id?.name || `${company.owner_id?.firstName || ''} ${company.owner_id?.lastName || ''}`.trim() || company.owner_id?.email || 'Unassigned'}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-10 py-6 text-right">
+                        <div className="flex justify-end gap-3">
+                          <button 
+                            onClick={() => setSelectedCompany(company)} 
+                            className="p-3 text-slate-400 hover:text-[#21a9ff] hover:bg-white rounded-xl shadow-sm transition-all"
+                            title="View details"
+                          >
+                            <FiEye size={20}/>
+                          </button>
+                          <button 
+                            onClick={() => setEditingCompany(company)} 
+                            className="p-3 text-slate-400 hover:text-amber-500 hover:bg-white rounded-xl shadow-sm transition-all"
+                            title="Edit company"
+                          >
+                            <FiEdit2 size={20}/>
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(company._id!)} 
+                            disabled={deleting === company._id}
+                            className="p-3 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Delete company"
+                          >
+                            {deleting === company._id ? <FiLoader className="animate-spin" size={20} /> : <FiTrash2 size={20}/>}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-10 py-32 text-center">
+                      <div className="flex flex-col items-center justify-center opacity-40">
+                        <FiBriefcase size={60} className="mb-4" />
+                        <p className="text-xl font-bold">No companies found</p>
+                        <p className="text-sm">Try adding a new company or changing your search.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-          <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-black text-slate-800">
-                {addingCompany ? 'Create New Company' : editingCompany ? 'Edit Company' : 'Company Details'}
-              </h2>
-              <button
-                onClick={() => {
-                  setAddingCompany(null);
-                  setEditingCompany(null);
-                  setSelectedCompany(null);
-                }}
-                className="p-2 hover:bg-slate-100 rounded-full transition-all"
-              >
-                <FiX size={20} />
+      {/* --- View Modal --- */}
+      {selectedCompany && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 border border-white/20 my-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-black text-slate-900">Company Details</h2>
+              <button onClick={() => setSelectedCompany(null)} className="p-3 hover:bg-slate-100 rounded-full transition-all">
+                <FiX size={24} />
               </button>
             </div>
 
-            {/* Add/Edit Form */}
-            {(addingCompany || editingCompany) && (
-              <div className="space-y-5">
-                {/* Company Name */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase ml-1">Company Name *</label>
-                  <input
-                    className="w-full px-5 py-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all"
-                    placeholder="Enter company name"
-                    value={addingCompany?.name || editingCompany?.name || ''}
-                    onChange={(e) =>
-                      addingCompany
-                        ? setAddingCompany({ ...addingCompany, name: e.target.value })
-                        : setEditingCompany({ ...editingCompany!, name: e.target.value })
-                    }
-                  />
-                </div>
-
-                {/* Industry */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase ml-1">Industry *</label>
-                  <input
-                    className="w-full px-5 py-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all"
-                    placeholder="e.g., Technology, Finance, Healthcare"
-                    value={addingCompany?.industry || editingCompany?.industry || ''}
-                    onChange={(e) =>
-                      addingCompany
-                        ? setAddingCompany({ ...addingCompany, industry: e.target.value })
-                        : setEditingCompany({ ...editingCompany!, industry: e.target.value })
-                    }
-                  />
-                </div>
-
-                {/* Website */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase ml-1">Website</label>
-                  <div className="relative">
-                    <FiGlobe className="absolute left-4 top-3.5 text-slate-400" size={16} />
-                    <input
-                      className="w-full pl-10 pr-5 py-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all"
-                      placeholder="e.g., www.example.com"
-                      value={addingCompany?.website || editingCompany?.website || ''}
-                      onChange={(e) =>
-                        addingCompany
-                          ? setAddingCompany({ ...addingCompany, website: e.target.value })
-                          : setEditingCompany({ ...editingCompany!, website: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Address */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase ml-1">Address</label>
-                  <div className="relative">
-                    <FiMapPin className="absolute left-4 top-3.5 text-slate-400" size={16} />
-                    <textarea
-                      className="w-full pl-10 pr-5 py-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all resize-none"
-                      placeholder="Enter company address"
-                      rows={3}
-                      value={addingCompany?.address || editingCompany?.address || ''}
-                      onChange={(e) =>
-                        addingCompany
-                          ? setAddingCompany({ ...addingCompany, address: e.target.value })
-                          : setEditingCompany({ ...editingCompany!, address: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Company Owner */}
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase ml-1">Assign Owner</label>
-                  <select
-                    className="w-full px-5 py-3 bg-slate-50 border-2 border-transparent rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all"
-                    value={addingCompany?.owner_id?._id || editingCompany?.owner_id?._id || ''}
-                    onChange={(e) => {
-                      const selected = users.find((u) => u._id === e.target.value);
-                      if (addingCompany) setAddingCompany({ ...addingCompany, owner_id: selected });
-                      else setEditingCompany({ ...editingCompany!, owner_id: selected });
-                    }}
-                  >
-                    <option value="">Select Owner</option>
-                    {users.map((u) => (
-                      <option key={u._id} value={u._id}>
-                        {u.name} ({u.role?.role_name || 'No Role'})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  onClick={addingCompany ? createCompany : updateCompany}
-                  disabled={loading}
-                  className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-400 disabled:to-slate-400 text-white rounded-xl font-black mt-6 shadow-lg transition-all"
-                >
-                  {loading ? 'Saving...' : addingCompany ? '✓ Create Company' : '✓ Update Company'}
-                </button>
+            <div className="space-y-6">
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Company Name</p>
+                <p className="text-2xl font-black text-slate-900">{selectedCompany.name}</p>
               </div>
-            )}
 
-            {/* View Mode */}
-            {selectedCompany && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-5 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl">
-                  <div className="p-3 bg-white rounded-lg shadow-sm text-indigo-600">
-                    <FiBriefcase size={24} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-black text-slate-400 uppercase">Company Name</p>
-                    <p className="text-2xl font-black text-slate-800">{selectedCompany.name}</p>
-                  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Industry</p>
+                  <p className="text-lg font-bold text-slate-700">{selectedCompany.industry}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                    <p className="text-xs font-black text-blue-600 uppercase mb-1">Industry</p>
-                    <p className="text-sm font-bold text-blue-900">{selectedCompany.industry}</p>
-                  </div>
-
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-                    <p className="text-xs font-black text-green-600 uppercase mb-1">Owner</p>
-                    <p className="text-sm font-bold text-green-900">{selectedCompany.owner_id?.name || 'Unassigned'}</p>
-                  </div>
-                </div>
-
-                {selectedCompany.website && (
-                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
-                    <p className="text-xs font-black text-purple-600 uppercase mb-2">Website</p>
-                    <a
-                      href={selectedCompany.website.startsWith('http') ? selectedCompany.website : `https://${selectedCompany.website}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-2 break-all"
-                    >
-                      <FiGlobe size={16} /> {selectedCompany.website}
-                    </a>
-                  </div>
-                )}
-
-                {selectedCompany.address && (
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                    <p className="text-xs font-black text-amber-600 uppercase mb-2">Address</p>
-                    <div className="flex items-start gap-2">
-                      <FiMapPin size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-amber-900">{selectedCompany.address}</p>
+                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Owner</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-[#6dc6fe]/20 flex items-center justify-center text-[#21a9ff] font-bold text-xs">
+                      {(selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}` || '?').charAt(0)}
                     </div>
+                    <p className="font-bold text-slate-700">
+                      {selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}`.trim() || selectedCompany.owner_id?.email || 'Unassigned'}
+                    </p>
                   </div>
-                )}
-
-                {canEditCompany && (
-                  <button
-                    onClick={() => {
-                      setEditingCompany(selectedCompany);
-                      setSelectedCompany(null);
-                    }}
-                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold mt-4 transition-all"
-                  >
-                    ✏️ Edit Company
-                  </button>
-                )}
+                </div>
               </div>
-            )}
+
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
+                  <FiGlobe /> Website
+                </p>
+                <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-[#21a9ff] hover:underline">
+                  {selectedCompany.website || 'No website'}
+                </a>
+              </div>
+
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
+                  <FiMapPin /> Address
+                </p>
+                <p className="text-lg font-bold text-slate-700">{selectedCompany.address || 'No address provided'}</p>
+              </div>
+
+              <button 
+                onClick={() => setSelectedCompany(null)}
+                className="w-full py-5 text-white rounded-[1.5rem] font-black shadow-2xl hover:brightness-110 active:scale-[0.98] transition-all mt-4 text-lg uppercase tracking-widest"
+                style={{ backgroundColor: PRIMARY_COLOR }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Add/Edit Modal --- */}
+      {(addingCompany || editingCompany) && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 border border-white/20 my-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-black text-slate-900">{addingCompany ? 'New Company' : 'Edit Company'}</h2>
+              <button onClick={() => { setAddingCompany(null); setEditingCompany(null); }} className="p-3 hover:bg-slate-100 rounded-full transition-all">
+                <FiX size={24} />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Company Name</label>
+                  <input 
+                    className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold"
+                    value={addingCompany?.name || editingCompany?.name || ''}
+                    onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, name: e.target.value}) : setEditingCompany({...editingCompany!, name: e.target.value})}
+                    placeholder="e.g. Google"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Industry</label>
+                  <input 
+                    className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold"
+                    value={addingCompany?.industry || editingCompany?.industry || ''}
+                    onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, industry: e.target.value}) : setEditingCompany({...editingCompany!, industry: e.target.value})}
+                    placeholder="e.g. Tech"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Website URL</label>
+                <div className="relative">
+                  <FiGlobe className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input 
+                    className="w-full pl-12 pr-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold"
+                    value={addingCompany?.website || editingCompany?.website || ''}
+                    onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, website: e.target.value}) : setEditingCompany({...editingCompany!, website: e.target.value})}
+                    placeholder="www.aura.com"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Assign to Owner</label>
+                <select 
+                  className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold appearance-none"
+                  value={addingCompany?.owner_id?._id || editingCompany?.owner_id?._id || ''}
+                  onChange={(e) => {
+                    const selectedUser = users.find(u => u._id === e.target.value);
+                    if (addingCompany) {
+                      setAddingCompany({...addingCompany, owner_id: selectedUser || null});
+                    } else {
+                      setEditingCompany({...editingCompany!, owner_id: selectedUser || null});
+                    }
+                  }}
+                >
+                  <option value="">Select an owner</option>
+                  {Array.isArray(users) && users.length > 0 ? (
+                    users.map(u => (
+                      <option key={u._id} value={u._id}>
+                        {u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || 'Unknown'}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No users available</option>
+                  )}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Address</label>
+                <textarea 
+                  className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold resize-none"
+                  rows={2}
+                  value={addingCompany?.address || editingCompany?.address || ''}
+                  onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, address: e.target.value}) : setEditingCompany({...editingCompany!, address: e.target.value})}
+                  placeholder="Street, City, Country"
+                />
+              </div>
+
+              <button 
+                onClick={addingCompany ? async () => {
+                  if (!addingCompany.name || !addingCompany.industry) {
+                    toast.error("Please fill in all required fields");
+                    return;
+                  }
+                  const loadToast = toast.loading("Creating...");
+                  try {
+                    await CompanyService.createCompany({...addingCompany, owner_id: addingCompany.owner_id?._id});
+                    toast.success("Success!", { id: loadToast });
+                    setAddingCompany(null);
+                    setSearchTerm('');
+                    await fetchCompanies('');
+                  } catch (e:any) { toast.error(e.message, {id: loadToast}); }
+                } : async () => {
+                  if (!editingCompany?.name || !editingCompany?.industry) {
+                    toast.error("Please fill in all required fields");
+                    return;
+                  }
+                  const loadToast = toast.loading("Updating...");
+                  try {
+                    await CompanyService.updateCompany(editingCompany!._id!, {...editingCompany, owner_id: editingCompany?.owner_id?._id});
+                    toast.success("Updated!", { id: loadToast });
+                    setEditingCompany(null);
+                    setSearchTerm('');
+                    await fetchCompanies('');
+                  } catch (e:any) { toast.error(e.message, {id: loadToast}); }
+                }}
+                className="w-full py-5 text-white rounded-[1.5rem] font-black shadow-2xl hover:brightness-110 active:scale-[0.98] transition-all mt-4 text-lg uppercase tracking-widest"
+                style={{ backgroundColor: PRIMARY_COLOR }}
+              >
+                Save Company Info
+              </button>
+            </div>
           </div>
         </div>
       )}

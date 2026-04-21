@@ -17,7 +17,7 @@ export const UserService = {
 
   async updateUser(id: string, userData: any) {
     return apiRequest(`/users/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(userData),
     });
   },
