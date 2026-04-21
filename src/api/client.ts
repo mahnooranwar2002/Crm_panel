@@ -9,8 +9,8 @@ const normalizeApiUrl = (rawUrl: string | undefined, fallback: string) => {
   return fallback;
 };
 
-// const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'https://crmbackend-flame.vercel.app');
-const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'http://localhost:5000/');
+const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'https://crmbackend-flame.vercel.app');
+// const API_BASE_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_BASE_URL, 'http://localhost:5000/');
 
 export async function apiRequest(endpoint: any, options: RequestInit = {}) {
   const url = `${API_BASE_URL}${endpoint}`;

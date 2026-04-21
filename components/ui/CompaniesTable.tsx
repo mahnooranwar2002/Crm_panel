@@ -119,11 +119,11 @@ const CompaniesTable = () => {
 
       console.log("✅ Users fetched:", userData);
       setUsers(Array.isArray(userData) ? userData : []);
-    } catch (err) {
+    } catch (err: any) {
       console.error("❌ Users fetch error:", err);
 
       // Handle specific mongoose model errors
-      if (err.message && err.message.includes("Schema hasn't been registered for model")) {
+      if (err?.message && err.message.includes("Schema hasn't been registered for model")) {
         console.warn("⚠️ Backend mongoose model issue detected. This is a server-side issue that needs to be fixed.");
         toast.error("Server configuration error. Please contact administrator.");
       }
