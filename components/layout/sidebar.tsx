@@ -9,6 +9,7 @@ import { FaUsers } from "react-icons/fa6";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { HiUserGroup } from "react-icons/hi2";
 import { IoLogoFoursquare } from "react-icons/io";
+import { SiEsotericsoftware } from "react-icons/si";
 import Image from "next/image";
 import logo from "../../src/assets/wholcure.png";
 import { getAvatarUrl } from "@/src/utils/avatarHelper";
@@ -56,6 +57,7 @@ export const Sidebar = () => {
       href: "/companies",
     },
     { icon: PiTrendUpDuotone, label: "Opportunities", href: "/opportunities" },
+    { icon: SiEsotericsoftware, label: "Software", href: "/software" },
   ];
 
   return (
