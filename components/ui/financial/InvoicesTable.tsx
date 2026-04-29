@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiLoader } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiLoader, FiEye, FiClock, FiCreditCard } from 'react-icons/fi'
 import { Invoice, getAllInvoices, createInvoice, updateInvoice, deleteInvoice } from '@/src/services/financial/InvoicesService'
 
 // Types (Refined)
@@ -38,6 +38,7 @@ const InvoicesTable = () => {
   const [formData, setFormData] = useState<FormData>(emptyInvoice)
   const [submitting, setSubmitting] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null)
 
   useEffect(() => { fetchInvoices() }, [])
 
@@ -96,6 +97,17 @@ const InvoicesTable = () => {
 
   const inputBase = "w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 bg-white"
 
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'paid': return 'bg-green-50 text-green-600'
+      case 'sent': return 'bg-blue-50 text-blue-600'
+      case 'draft': return 'bg-slate-50 text-slate-600'
+      case 'overdue': return 'bg-red-50 text-red-600'
+      case 'cancelled': return 'bg-gray-50 text-gray-600'
+      default: return 'bg-slate-50 text-slate-600'
+    }
+  }
+
   return (
     <div className="p-8 max-w-7xl mx-auto text-slate-800">
       {/* Header */}
@@ -125,6 +137,7 @@ const InvoicesTable = () => {
             <div className="flex gap-2 mt-6">
               <button onClick={() => { setFormData(invoice as any); setIsEditing(true); setShowModal(true); }} className="flex-1 py-2.5 bg-slate-50 rounded-xl flex justify-center text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors"><FiEdit2 /></button>
               <button onClick={() => invoice._id && deleteInvoice(invoice._id).then(fetchInvoices)} className="flex-1 py-2.5 bg-slate-50 rounded-xl flex justify-center text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"><FiTrash2 /></button>
+              <button onClick={() => setViewingInvoice(invoice)} className="flex-1 py-2.5 bg-slate-50 rounded-xl flex justify-center text-slate-500 hover:bg-green-50 hover:text-green-600 transition-colors"><FiEye size={18} /></button>
             </div>
           </div>
         ))}
@@ -189,6 +202,67 @@ const InvoicesTable = () => {
           </form>
         </div>
       )}
+
+      {/* ///////////////////// */}
+      {/* VIEW DETAILS MODAL */}
+      {viewingInvoice && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setViewingInvoice(null)} />
+          <div className="relative bg-white/90 backdrop-blur-2xl rounded-[3rem] shadow-2xl w-full max-w-lg border border-white/20 overflow-hidden transform transition-all animate-in zoom-in duration-300">
+            <div className="p-10">
+              <div className="flex justify-between items-start mb-8">
+                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingInvoice.status)}`}>
+                  {viewingInvoice.status}
+                </span>
+                <button onClick={() => setViewingInvoice(null)} className="p-3 bg-slate-100 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+                  <FiX size={24} />
+                </button>
+              </div>
+
+              <h2 className="text-4xl font-black text-slate-900 mb-2">Invoice {viewingInvoice.invoiceNumber}</h2>
+              <p className="text-slate-500 font-medium mb-8">{viewingInvoice.clientName}</p>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm">
+                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Amount</p>
+                  <p className="text-3xl font-black text-blue-600">${viewingInvoice.amount.toFixed(2)}</p>
+                </div>
+                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm flex flex-col justify-center">
+                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Status</p>
+                  <p className="text-lg font-black text-slate-700 capitalize">{viewingInvoice.status}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 px-2 border-t border-slate-100 pt-6">
+                <div className="flex justify-between items-center py-2">
+                  <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest"><FiClock /> Issue Date</div>
+                  <div className="font-black text-slate-700">{new Date(viewingInvoice.issueDate).toLocaleDateString()}</div>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <div className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest"><FiCreditCard /> Due Date</div>
+                  <div className="font-black text-slate-700">{new Date(viewingInvoice.dueDate).toLocaleDateString()}</div>
+                </div>
+                {viewingInvoice.email && (
+                  <div className="flex justify-between items-center py-2">
+                    <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Email</div>
+                    <div className="font-black text-slate-700">{viewingInvoice.email}</div>
+                  </div>
+                )}
+                {viewingInvoice.phone && (
+                  <div className="flex justify-between items-center py-2">
+                    <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Phone</div>
+                    <div className="font-black text-slate-700">{viewingInvoice.phone}</div>
+                  </div>
+                )}
+                {viewingInvoice.description && (
+                  <div className="mt-4 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">"{viewingInvoice.description}"</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ///////////////////// */}
     </div>
   )
 }

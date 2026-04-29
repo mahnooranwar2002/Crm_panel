@@ -1,13 +1,11 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react'
+import SoftwareDashboard from '@/components/ui/software/SoftwareDashboard'
 
-export default function SoftwareMain() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push('/software/track-all-projects');
-  }, [router]);
-
-  return null;
+export default function SoftwareManagement() {
+  return (
+    <div className="w-full">
+        <SoftwareDashboard/>
+    </div>
+  )
 }

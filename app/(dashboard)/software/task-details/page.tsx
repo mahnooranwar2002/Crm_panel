@@ -1,4 +1,4 @@
-import TaskDetailsComponent from '@/components/ui/TaskDetails'
+import TaskDetailsComponent from '@/components/ui/software/TaskDetails'
 
 export default function TaskDetailsPage() {
   return (

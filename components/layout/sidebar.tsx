@@ -10,7 +10,8 @@ import { useSidebar } from "@/hooks/use-sidebar";
 import { HiUserGroup } from "react-icons/hi2";
 import { IoLogoFoursquare } from "react-icons/io";
 import { SiEsotericsoftware } from "react-icons/si";
-import { RiStockLine } from "react-icons/ri";
+import { RiStockLine, RiMailSendLine } from "react-icons/ri";
+import { FaFileMedicalAlt } from "react-icons/fa";
 import Image from "next/image";
 import logo from "../../src/assets/wholcure.png";
 import { getAvatarUrl } from "@/src/utils/avatarHelper";
@@ -51,15 +52,6 @@ export const Sidebar = () => {
   const menuItems = [
     { icon: FiHome, label: "Dashboard", href: "/home" },
     { icon: FaUsers, label: "User Management", href: "/user" },
-    { icon: MdManageAccounts, label: "Leads Management", href: "/leads" },
-    { icon: HiUserGroup, label: "Roles Management", href: "/roles" },
-    {
-      icon: IoLogoFoursquare,
-      label: "Companies Management",
-      href: "/companies",
-    },
-    { icon: PiTrendUpDuotone, label: "Opportunities", href: "/opportunities" },
-    { icon: SiEsotericsoftware, label: "Software", href: "/software" },
     {
       icon: RiStockLine,
       label: "Finance",
@@ -67,9 +59,56 @@ export const Sidebar = () => {
       submenu: [
         { label: "Invoices", href: "/financial/Invoices" },
         { label: "Expenses", href: "/financial/expenses" },
-        { label: "Transactions", href: "/financial/transactions" },
+        { label: "Payments", href: "/financial/payments" },
       ],
     },
+    {
+      icon: RiMailSendLine,
+      label: "Marketing",
+      href: "/marketing",
+      submenu: [
+        { label: "Campaigns", href: "/marketing/campaigns" },
+        { label: "Drip Campaigns", href: "/marketing/drip-campaigns" },
+        { label: "Lead Scoring", href: "/marketing/lead-scoring" },
+        { label: "Workflows", href: "/marketing/workflows" },
+        { label: "Social Integration", href: "/marketing/social-integration" },
+      ],
+    },
+    {
+      icon: FaFileMedicalAlt,
+      label: "Medical",
+      href: "/medical",
+      submenu: [
+        { label: "Patients", href: "/medical/patients" },
+        { label: "Providers", href: "/medical/providers" },
+        { label: "Appointments", href: "/medical/appointments" },
+        { label: "Insurance", href: "/medical/insurance" },
+        { label: "Eligibility Check", href: "/medical/insurance/eligibility" },
+        { label: "Encounters", href: "/medical/encounters" },
+        { label: "Claims", href: "/medical/claims" },
+        { label: "Payments & ERA", href: "/medical/payments" },
+        { label: "Denials", href: "/medical/denials" },
+        { label: "Reports", href: "/medical/reports" },
+      ],
+    },
+    { icon: MdManageAccounts, label: "Leads Management", href: "/leads" },
+    { icon: HiUserGroup, label: "Roles Management", href: "/roles" },
+    {
+      icon: SiEsotericsoftware,
+      label: "Software",
+      href: "/software",
+      submenu: [
+        { label: "Track All Projects", href: "/software/track-all-projects" },
+        { label: "Task Details", href: "/software/task-details" },
+        { label: "Project Status", href: "/software/project-status" },
+      ],
+    },
+    {
+      icon: IoLogoFoursquare,
+      label: "Companies Management",
+      href: "/companies",
+    },
+    { icon: PiTrendUpDuotone, label: "Opportunities", href: "/opportunities" },
   ];
 
   return (

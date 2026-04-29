@@ -1,5 +1,5 @@
 import React from 'react'
-import SoftwareTable from '@/components/ui/SoftwareTable'
+import SoftwareTable from '@/components/ui/software/SoftwareTable'
 
 export default function TrackAllProjects() {
   return (
