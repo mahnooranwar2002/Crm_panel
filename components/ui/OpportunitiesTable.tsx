@@ -442,6 +442,11 @@ export const OpportunitiesTable = () => {
                     <p className="text-xs text-rose-600 font-bold mt-1">⚠️ Required - choose a company</p>
                   )}
                 </div>
+                {contacts.map((contact) => (
+  <option key={contact._id} value={contact._id}>
+    {contact.name}
+  </option>
+))}
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Assignee (Owner) *</label>
