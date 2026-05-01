@@ -1,21 +1,134 @@
 'use client'
 
-import React, { useState } from 'react'
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFileText, FiUser, FiActivity, FiDollarSign, FiHash } from 'react-icons/fi'
+import React, { useState, useEffect } from 'react'
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiFileText, FiUser, FiActivity, FiDollarSign, FiHash, FiX, FiEye } from 'react-icons/fi'
+import { encounterService, ENCOUNTER_SEED_DATA } from '@/src/services/medical/encounterService'
 
 // 1. Encounters Table Main Component
 export function EncountersTable() {
-  const [encounters, setEncounters] = useState([])
+  const [encounters, setEncounters] = useState<any[]>(ENCOUNTER_SEED_DATA)
+  const [showModal, setShowModal] = useState(false)
+  const [viewCardOpen, setViewCardOpen] = useState(false)
+  const [currentEncounter, setCurrentEncounter] = useState<any>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    patient: '',
+    date: '',
+    charge: '',
+    encounterType: 'Office Visit',
+    provider: '',
+    chiefComplaint: '',
+    diagnosisCodes: '',
+    procedures: ''
+  })
+
+  const loadEncounters = async () => {
+    try {
+      const data = await encounterService.getAllEncounters()
+      setEncounters(data || ENCOUNTER_SEED_DATA)
+    } catch (error) {
+      console.error('Error loading encounters:', error)
+      setEncounters(ENCOUNTER_SEED_DATA)
+    }
+  }
+
+  const handleOpenModal = (encounter?: any) => {
+    if (encounter) {
+      setEditingId(encounter.id)
+      setFormData({
+        patient: encounter.patient,
+        date: encounter.date,
+        charge: encounter.charge.toString(),
+        encounterType: encounter.encounterType,
+        provider: encounter.provider,
+        chiefComplaint: encounter.chiefComplaint,
+        diagnosisCodes: encounter.diagnosisCodes.join(', '),
+        procedures: encounter.procedures.join(', ')
+      })
+    } else {
+      setEditingId(null)
+      setFormData({
+        patient: '',
+        date: '',
+        charge: '',
+        encounterType: 'Office Visit',
+        provider: '',
+        chiefComplaint: '',
+        diagnosisCodes: '',
+        procedures: ''
+      })
+    }
+    setShowModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+    setEditingId(null)
+  }
+
+  const handleViewCard = (encounter: any) => {
+    setCurrentEncounter(encounter)
+    setViewCardOpen(true)
+  }
+
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+    try {
+      const dataToSubmit = {
+        ...formData,
+        charge: parseFloat(formData.charge),
+        diagnosisCodes: formData.diagnosisCodes.split(',').map(c => c.trim()).filter(c => c),
+        procedures: formData.procedures.split(',').map(p => p.trim()).filter(p => p)
+      }
+
+      if (editingId) {
+        await encounterService.updateEncounter(editingId, dataToSubmit)
+      } else {
+        await encounterService.createEncounter(dataToSubmit)
+      }
+      await loadEncounters()
+      handleCloseModal()
+    } catch (error) {
+      console.error('Error saving encounter:', error)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this encounter?')) {
+      try {
+        await encounterService.deleteEncounter(id)
+        await loadEncounters()
+      } catch (error) {
+        console.error('Error deleting encounter:', error)
+      }
+    }
+  }
+
+  const handleMarkReady = async (id: string) => {
+    try {
+      await encounterService.markReadyForBilling(id)
+      await loadEncounters()
+    } catch (error) {
+      console.error('Error updating encounter:', error)
+    }
+  }
 
   return (
-    <div className="w-full bg-slate-50 min-h-screen p-6">
+    <div className="w-full bg-slate-50 min-h-screen p-6 text-black">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Encounters & Charge Capture</h1>
             <p className="text-slate-500 font-medium mt-1">Manage patient visits and capture service charges in real-time.</p>
           </div>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all font-bold active:scale-95">
+          <button 
+            onClick={() => handleOpenModal()}
+            className="bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all font-bold active:scale-95">
             <FiPlus size={20} />
             New Encounter
           </button>
@@ -51,15 +164,26 @@ export function EncountersTable() {
                       <td className="px-6 py-4 font-mono text-sm text-slate-500">#{encounter.id}</td>
                       <td className="px-6 py-4 font-bold text-slate-900">{encounter.patient}</td>
                       <td className="px-6 py-4 text-slate-600 font-medium">{encounter.date}</td>
-                      <td className="px-6 py-4 font-bold text-slate-900">${encounter.charge}</td>
+                      <td className="px-6 py-4 font-bold text-slate-900">${encounter.charge.toFixed(2)}</td>
                       <td className="px-6 py-4">
-                        <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter bg-amber-50 text-amber-700 border border-amber-100">
-                          Open
+                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border ${
+                          encounter.status === 'Open' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                          encounter.status === 'Ready for Billing' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                          'bg-emerald-50 text-emerald-700 border-emerald-100'
+                        }`}>
+                          {encounter.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right space-x-3">
-                        <button className="text-slate-400 hover:text-blue-600 transition-colors"><FiEdit2 size={18} /></button>
-                        <button className="text-slate-400 hover:text-red-600 transition-colors"><FiTrash2 size={18} /></button>
+                        <button 
+                          onClick={() => { setCurrentEncounter(encounter); setViewCardOpen(true); }}
+                          className="text-slate-400 hover:text-green-600 transition-colors"><FiEye size={18} /></button>
+                        <button 
+                          onClick={() => handleOpenModal(encounter)}
+                          className="text-slate-400 hover:text-blue-600 transition-colors"><FiEdit2 size={18} /></button>
+                        <button 
+                          onClick={() => handleDelete(encounter.id)}
+                          className="text-slate-400 hover:text-red-600 transition-colors"><FiTrash2 size={18} /></button>
                       </td>
                     </tr>
                   ))
@@ -69,6 +193,147 @@ export function EncountersTable() {
           </div>
         </div>
       </div>
+
+      {/* 1. VIEW CARD MODAL (Clean & Simple) */}
+      {viewCardOpen && currentEncounter && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">
+          {/* Solid Dark Overlay for focus */}
+          <div className="absolute inset-0 bg-slate-900/50" onClick={() => setViewCardOpen(false)} />
+          
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+            {/* Header - Simple Slate */}
+            <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800 tracking-tight">View Encounter Details</h3>
+              <button onClick={() => setViewCardOpen(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                <FiX size={20} />
+              </button>
+            </div>
+            
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 bg-blue-50 p-4 rounded-xl">
+                  <label className="block text-[10px] font-bold text-blue-600 uppercase mb-1">Total Charge</label>
+                  <p className="text-2xl font-black text-blue-900">${currentEncounter.charge.toFixed(2)}</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Patient Name</label>
+                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.patient}</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Encounter Type</label>
+                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.encounterType}</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Date of Service</label>
+                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.date}</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Provider</label>
+                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.provider}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 text-right">
+              <button onClick={() => setViewCardOpen(false)} className="px-6 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. EDIT MODAL (Clean Background & No Navbar Cut) */}
+      {showModal && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          {/* Clear backdrop - No heavy blur */}
+          <div className="absolute inset-0 bg-slate-900/60" onClick={handleCloseModal} />
+          
+          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+            {/* Simple Sticky Header */}
+            <div className="sticky top-0 bg-white border-b border-slate-100 px-8 py-5 flex items-center justify-between z-10">
+              <h2 className="text-xl font-bold text-slate-900">
+                {editingId ? 'Edit Encounter' : 'New Encounter'}
+              </h2>
+              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600">
+                <FiX size={22} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600 uppercase">Patient Name</label>
+                  <input 
+                    name="patient"
+                    value={formData.patient}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600 uppercase">Provider</label>
+                  <input 
+                    name="provider"
+                    value={formData.provider}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600 uppercase">Date</label>
+                  <input 
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg outline-none"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600 uppercase">Charge ($)</label>
+                  <input 
+                    type="number"
+                    name="charge"
+                    value={formData.charge}
+                    onChange={handleInputChange}
+                    step="0.01"
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg outline-none font-bold"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-600 uppercase">Chief Complaint</label>
+                <textarea 
+                  name="chiefComplaint"
+                  value={formData.chiefComplaint}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg outline-none"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">
+                  {editingId ? 'Update' : 'Create'}
+                </button>
+                <button type="button" onClick={handleCloseModal} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-lg font-bold">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

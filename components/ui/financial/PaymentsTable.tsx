@@ -269,9 +269,9 @@ const PaymentsTable = () => {
 
       {/* CREATE/EDIT MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setShowModal(false)} />
-          <div className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowModal(false)} />
+          <div className="relative bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white/20">
             <div className="p-10">
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-2xl font-black text-slate-900">{isEditing ? 'Edit Transaction' : 'Record Payment'}</h2>
