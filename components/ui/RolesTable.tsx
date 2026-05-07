@@ -1,26 +1,24 @@
-<<<<<<< HEAD
 "use client"
 import React, { useState, useEffect } from 'react';
-import { FiShield, FiEdit3, FiTrash2, FiPlus, FiLock, FiSettings, FiCheckCircle } from 'react-icons/fi';
+import { FiEdit3, FiTrash2, FiPlus, FiLock, FiSettings, FiX } from 'react-icons/fi';
 import { RoleService } from '@/src/services/roleService';
-
-// Define a type for your Role for better DX
-interface Role {
-  id: string | number;
-  role_name: string;
-  permissions: string;
-  users_count: number;
-  status: number;
-}
+import toast, { Toaster } from 'react-hot-toast';
 
 const RolesTable = () => {
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [newRoleName, setNewRoleName] = useState('');
+  const [newRoleStatus, setNewRoleStatus] = useState('1');
+  const [newRolePermissions, setNewRolePermissions] = useState<string[]>([]);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<any>(null);
+  const [editRoleName, setEditRoleName] = useState('');
+  const [editRoleStatus, setEditRoleStatus] = useState('1');
+  const [editRolePermissions, setEditRolePermissions] = useState<string[]>([]);
 
   useEffect(() => {
     fetchRoles();
@@ -29,157 +27,91 @@ const RolesTable = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true);
-      const data = await RoleService.getRoles(1, 100);
-      const rolesArray = Array.isArray(data) ? data : data?.roles || [];
+      const response = await RoleService.getRoles(1, 100);
+      
+      // FIX: Backend response structure 'response.data.roles' hai
+      let rolesArray = [];
+      if (response && response.data && Array.isArray(response.data.roles)) {
+        rolesArray = response.data.roles;
+      } else if (Array.isArray(response)) {
+        rolesArray = response;
+      } else if (response && Array.isArray(response.roles)) {
+        rolesArray = response.roles;
+      }
+      
       setRoles(rolesArray);
       setError(null);
     } catch (err: any) {
+      console.error('Error fetching roles:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenModal = (role: Role | null = null) => {
-    setSelectedRole(role);
-    setIsModalOpen(true);
-  };
-
-  const deleteRole = async (id: any) => {
-    if (window.confirm('Are you sure you want to delete this role? This might affect assigned users.')) {
-      try {
-        await RoleService.deleteRole(id);
-        setRoles(roles.filter(r => r.id !== id)); // Optimistic UI update
-      } catch (err: any) {
-        alert('Error: ' + err.message);
-      }
+  const handleCreateRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const loadToast = toast.loading("Creating new role..."); // Loading start
+    try {
+      await RoleService.createRole({ 
+        role_name: newRoleName, 
+        status: parseInt(newRoleStatus),
+        permissions: newRolePermissions 
+      });
+      
+      toast.success("Role created successfully!", { id: loadToast }); // Success
+      setIsModalOpen(false);
+      setNewRoleName('');
+      setNewRoleStatus('1');
+      setNewRolePermissions([]);
+      fetchRoles();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create role", { id: loadToast }); // Error
     }
-  };
-
-  return (
-    <div className="w-full text-black space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-      {/* --- HEADER --- */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
-        <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-            <FiShield className="text-emerald-600" /> Roles & Permissions
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">Define access levels and security protocols for your team.</p>
-        </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-200 active:scale-95"
-        >
-          <FiPlus size={18} />
-          <span>Define New Role</span>
-        </button>
-      </div>
-
-      {/* --- TABLE CONTAINER --- */}
-      <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.03)] overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-600"></div>
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-4">
-            <p className="text-rose-600 font-medium bg-rose-50 px-4 py-2 rounded-lg">{error}</p>
-            <button onClick={fetchRoles} className="text-sm font-bold text-emerald-600 hover:underline">Retry Connection</button>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/60 border-b border-slate-100">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role Name</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Permissions Scope</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Active Users</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {roles.map((role) => (
-                  <tr key={role.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${role.role_name.toLowerCase().includes('admin') ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
-                          <FiLock size={16} />
-                        </div>
-                        <span className="font-bold text-slate-700">{role.role_name}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex flex-wrap gap-1">
-                        {role.permissions.split(',').slice(0, 3).map((p, i) => (
-                          <span key={i} className="text-[11px] font-semibold text-slate-500 bg-white border border-slate-100 px-2 py-1 rounded-md shadow-sm">
-                            {p.trim()}
-                          </span>
-                        ))}
-                        {role.permissions.split(',').length > 3 && (
-                          <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
-                            +{role.permissions.split(',').length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 text-center">
-                      <span className="text-xs font-black text-slate-600 bg-slate-100 w-8 h-8 inline-flex items-center justify-center rounded-full">
-                        {role.users_count}
-                      </span>
-                    </td>
-                    <td className="px-8 py-5 text-center">
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${role.status === 1 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${role.status === 1 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
-                        {role.status === 1 ? 'Active' : 'Disabled'}
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => handleOpenModal(role)}
-                          className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-                        >
-                          <FiSettings size={18} />
-                        </button>
-                        <button 
-                          onClick={() => deleteRole(role.id)}
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 };
 
-=======
-"use client"
-import React, { useState } from 'react';
-import { FiShield, FiEdit3, FiTrash2, FiPlus, FiCheckCircle, FiLock, FiSettings } from 'react-icons/fi';
+  const handleEditRole = (role: any) => {
+    setEditingRole(role);
+    setEditRoleName(role.role_name);
+    setEditRoleStatus(role.status.toString());
+    setEditRolePermissions(Array.isArray(role.permissions) ? role.permissions : []);
+    setIsEditModalOpen(true);
+  };
 
-// Dummy Roles Data based on RBAC documentation
-const initialRoles = [
-  { id: 1, role_name: 'Super Admin', status: 1, permissions: 'All Access', users_count: 2 },
-  { id: 2, role_name: 'Sales Manager', status: 1, permissions: 'View, Edit, Delete', users_count: 5 },
-  { id: 3, role_name: 'Sales Agent', status: 1, permissions: 'View, Edit (Own)', users_count: 12 },
-  { id: 4, role_name: 'Support Executive', status: 0, permissions: 'View Only', users_count: 4 },
-];
+  const handleUpdateRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const loadToast = toast.loading("Updating role settings...");
+    try {
+      await RoleService.updateRole(editingRole._id, { 
+        role_name: editRoleName, 
+        status: parseInt(editRoleStatus),
+        permissions: editRolePermissions 
+      });
 
-const RolesTable = () => {
-  const [roles, setRoles] = useState(initialRoles);
+      toast.success("Role updated successfully! ✨", { id: loadToast });
+      setIsEditModalOpen(false);
+      setEditingRole(null);
+      fetchRoles();
+    } catch (err: any) {
+      toast.error(err.message || "Update failed", { id: loadToast });
+    }
+};
+
+  const handleDeleteRole = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this role?')) {
+      try {
+        await RoleService.deleteRole(id);
+        toast.success("Role deleted successfully");
+        fetchRoles();
+      } catch (err: any) {
+        toast.error("Error: " + err.message);
+      }
+    }
+};
 
   return (
-    <div className="w-full space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-      {/* --- HEADER --- */}
+    <div className="w-full text-black space-y-6 animate-in slide-in-from-bottom-4 duration-500 relative">
+      
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
         <div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
@@ -187,74 +119,159 @@ const RolesTable = () => {
           </h1>
           <p className="text-sm text-slate-500 mt-1">Define access levels and security protocols for your team.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-2xl font-bold text-sm transition-all shadow-lg shadow-emerald-100 active:scale-95">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center justify-center gap-2 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg shadow-blue-100"
+        >
           <FiPlus size={18} />
           <span>Define New Role</span>
         </button>
       </div>
 
-      {/* --- ROLES GRID/TABLE --- */}
-      <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.03)] overflow-hidden">
+      {error && (
+        <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-lg mx-2">
+          Error: {error}
+        </div>
+      )}
+
+      <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.03)] overflow-hidden mx-2">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/60 border-b border-slate-100">
                 <th className="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Role Name</th>
                 <th className="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Scope & Permissions</th>
-                <th className="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] text-center">Users</th>
                 <th className="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
                 <th className="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] text-right">Settings</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {roles.map((role) => (
-                <tr key={role.id} className="hover:bg-indigo-50/20 transition-all duration-300 group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${role.role_name === 'Super Admin' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
-                        <FiLock size={18} />
+              {loading ? (
+                <tr><td colSpan={4} className="px-8 py-20 text-center text-slate-400 font-medium">Loading security protocols...</td></tr>
+              ) : roles.length === 0 ? (
+                <tr><td colSpan={4} className="px-8 py-20 text-center text-slate-400 font-medium">No roles found in the directory</td></tr>
+              ) : (
+                roles.map((role) => (
+                  <tr key={role._id} className="hover:bg-blue-50/30 transition-all duration-300 group">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-xl bg-blue-50 text-[#21a9ff]">
+                          <FiLock size={18} />
+                        </div>
+                        {/* FIX: Field name role_name use karein */}
+                        <span className="font-bold text-slate-800 text-[15px]">{role.role_name || 'Unnamed Role'}</span>
                       </div>
-                      <span className="font-bold text-slate-800 text-[15px]">{role.role_name}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className="text-sm font-medium text-slate-500 bg-white border border-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
-                      {role.permissions}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-center">
-                    <span className="text-[13px] font-extrabold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
-                      {role.users_count}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex justify-center">
-                      <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${role.status === 1 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${role.status === 1 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
-                        {role.status === 1 ? 'Active' : 'Disabled'}
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex flex-wrap gap-1.5">
+                        {Array.isArray(role.permissions) && role.permissions.length > 0 ? (
+                          role.permissions.map((perm: string, index: number) => (
+                            <span key={index} className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md border border-blue-100/50">
+                              {perm}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">Global Access</span>
+                        )}
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button title="Edit Permissions" className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-white rounded-xl transition-all hover:shadow-md">
-                        <FiSettings size={18} />
-                      </button>
-                      <button title="Delete Role" className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all hover:shadow-md">
-                        <FiTrash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex justify-center">
+                        {/* FIX: status Number check */}
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${Number(role.status) === 1 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${Number(role.status) === 1 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
+                          {Number(role.status) === 1 ? 'Active' : 'Disabled'}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex items-center justify-end gap-2 transition-opacity">
+                        <button onClick={() => handleEditRole(role)} className="p-2.5 text-slate-400 hover:text-[#21a9ff] hover:bg-white rounded-xl transition-all hover:shadow-md border border-transparent hover:border-slate-100">
+                          <FiSettings size={18} />
+                        </button>
+                        <button onClick={() => handleDeleteRole(role._id)} className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all hover:shadow-md border border-transparent hover:border-slate-100">
+                          <FiTrash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
-      
+
+      {/* CREATE ROLE MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-[440px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="px-10 pt-10 pb-6 flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">New Role</h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
+                <FiX size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleCreateRole} className="px-10 pb-10 space-y-6">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Role Title</label>
+                <input type="text" required value={newRoleName} onChange={(e) => setNewRoleName(e.target.value)} placeholder="e.g. Senior Manager" className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium" />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Initial Status</label>
+                <select value={newRoleStatus} onChange={(e)=>setNewRoleStatus(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer">
+                  <option value="1">Active</option>
+                  <option value="0">Disabled</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Permissions (comma-separated)</label>
+                <input type="text" value={newRolePermissions.join(', ')} onChange={(e) => setNewRolePermissions(e.target.value.split(',').map(p => p.trim()).filter(p => p))} placeholder="Sales, Support, Admin" className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white outline-none font-medium" />
+              </div>
+              <button type="submit" className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]">
+                Deploy Role
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT ROLE MODAL */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 text-black z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-[440px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="px-10 pt-10 pb-6 flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Modify Role</h2>
+              <button onClick={() => setIsEditModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
+                <FiX size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateRole} className="px-10 pb-10 space-y-6">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Update Title</label>
+                <input type="text" required value={editRoleName} onChange={(e) => setEditRoleName(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] outline-none text-slate-700 font-medium" />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Update Status</label>
+                <select value={editRoleStatus} onChange={(e)=>setEditRoleStatus(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none">
+                  <option value="1">Active</option>
+                  <option value="0">Disabled</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Modify Permissions</label>
+                <input type="text" value={editRolePermissions.join(', ')} onChange={(e) => setEditRolePermissions(e.target.value.split(',').map(p => p.trim()).filter(p => p))} className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] outline-none font-medium" />
+              </div>
+              <button type="submit" className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-100">
+                Update Security Profile
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };
 
->>>>>>> main
 export default RolesTable;

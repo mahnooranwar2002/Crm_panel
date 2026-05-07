@@ -12,10 +12,10 @@ export default function LandingPage() {
           <img src="https://wholcure.vercel.app/wholcure.png" alt="Wholcure Logo" className="h-10" />
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
-            Sign In
+          <Link href="/home" className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
+            Dashboard
           </Link>
-          <Link href="/login" className="px-6 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-emerald-600 transition-all shadow-lg active:scale-95">
+          <Link href="/home" className="px-6 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-emerald-600 transition-all shadow-lg active:scale-95">
             Get Started
           </Link>
         </div>
@@ -37,7 +37,7 @@ export default function LandingPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/login" className="px-10 py-5 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-[2px] flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-200 active:scale-95">
+          <Link href="/home" className="px-10 py-5 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-[2px] flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-200 active:scale-95">
             Enter Dashboard <FiArrowRight size={18} />
           </Link>
         </div>
