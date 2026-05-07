@@ -318,7 +318,7 @@ import { HiUserGroup } from "react-icons/hi2";
 import { IoLogoFoursquare } from "react-icons/io";
 import { SiEsotericsoftware } from "react-icons/si";
 import { RiStockLine, RiMailSendLine } from "react-icons/ri";
-import { FaFileMedicalAlt } from "react-icons/fa";
+import { FaFileMedicalAlt, FaBuilding } from "react-icons/fa";
 import Image from "next/image";
 import logo from "../../src/assets/wholcure.png";
 import { getAvatarUrl } from "@/src/utils/avatarHelper";
@@ -409,6 +409,19 @@ export const Sidebar = () => {
         { label: "Track All Projects", href: "/software/track-all-projects" },
         { label: "Task Details", href: "/software/task-details" },
         { label: "Project Status", href: "/software/project-status" },
+      ],
+    },
+    {
+      icon: FaBuilding,
+      label: "Real Estate",
+      href: "/real-estate",
+      submenu: [
+        { label: "Properties", href: "/real-estate/properties" },
+        { label: "Projects", href: "/real-estate/projects" },
+        { label: "Tasks", href: "/real-estate/tasks" },
+        { label: "Resources", href: "/real-estate/resources" },
+        { label: "Inspections", href: "/real-estate/inspections" },
+        { label: "Permits", href: "/real-estate/permits" },
       ],
     },
     { icon: IoLogoFoursquare, label: "Companies Management", href: "/companies" },
