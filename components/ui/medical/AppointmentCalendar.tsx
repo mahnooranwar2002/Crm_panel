@@ -433,17 +433,20 @@ export function AppointmentCalendar() {
 }
 
 // --- 2. MODAL WRAPPER ---
+
 function ModalWrapper({ children, title, onClose }: { children: React.ReactNode, title: string, onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex justify-end"> {/* Flex end se right side align hoga */}
+      {/* Background Glass Effect */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl transition-opacity duration-300" 
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity duration-300" 
         onClick={onClose} 
         aria-hidden="true"
       />
       
-      <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20 flex flex-col animate-in fade-in zoom-in duration-200">
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/50 backdrop-blur-md">
+      {/* Sidebar Content */}
+      <div className="relative bg-white w-full max-w-lg h-full shadow-2xl border-l border-slate-200 flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
           <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase text-[13px] tracking-[0.05em]">{title}</h2>
           <button 
             onClick={onClose} 
@@ -453,7 +456,8 @@ function ModalWrapper({ children, title, onClose }: { children: React.ReactNode,
           </button>
         </div>
         
-        <div className="p-8 overflow-y-auto custom-scrollbar">
+        {/* Scrollable Form/Detail Area */}
+        <div className="p-8 overflow-y-auto custom-scrollbar h-full">
           {children}
         </div>
       </div>

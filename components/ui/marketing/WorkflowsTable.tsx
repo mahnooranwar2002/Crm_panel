@@ -146,34 +146,45 @@ const WorkflowsTable = () => {
                 <FiTrash2 />
               </button>
               <button
-                              onClick={() => setViewingWorkflow(workflow)}
-                              className="flex-1 py-2.5 bg-slate-50 rounded-xl flex justify-center text-slate-500 hover:bg-green-50 hover:text-green-600 transition-colors"
-                            >
-                              <FiEye size={18} />
-                            </button>
+                onClick={() => setViewingWorkflow(workflow)}
+                className="flex-1 py-2.5 bg-slate-50 rounded-xl flex justify-center text-slate-500 hover:bg-green-50 hover:text-green-600 transition-colors"
+              >
+                <FiEye size={18} />
+              </button>
             </div>
           </div>
         ))}
       </div>
 
       {/* ///////////////////// */}
-      {/* VIEW DETAILS MODAL */}
+      {/* VIEW DETAILS SIDEBAR */}
       {viewingWorkflow && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setViewingWorkflow(null)} />
-          <div className="relative bg-white/90 backdrop-blur-2xl rounded-[3rem] shadow-2xl w-full max-w-lg border border-white/20 overflow-hidden transform transition-all animate-in zoom-in duration-300">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-8">
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingWorkflow.status)}`}>
-                  {viewingWorkflow.status}
-                </span>
-                <button onClick={() => setViewingWorkflow(null)} className="p-3 bg-slate-100 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewingWorkflow(null)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">{viewingWorkflow.workflow_name}</h2>
+                <button
+                  onClick={() => setViewingWorkflow(null)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                  type="button"
+                >
                   <FiX size={24} />
                 </button>
               </div>
 
-              <h2 className="text-4xl font-black text-slate-900 mb-2">{viewingWorkflow.workflow_name}</h2>
-              <p className="text-slate-500 font-medium mb-8">Created by {viewingWorkflow.created_by}</p>
+              <div className="space-y-4">
+                <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingWorkflow.status)}`}>
+                  {viewingWorkflow.status}
+                </span>
+              </div>
+
+              <p className="text-slate-500 font-medium">Created by {viewingWorkflow.created_by}</p>
+
 
               {viewingWorkflow.description && (
                 <p className="text-sm text-slate-600 mb-6 bg-slate-50 p-3 rounded-xl">{viewingWorkflow.description}</p>
@@ -216,35 +227,39 @@ const WorkflowsTable = () => {
                   <div className="font-black text-slate-700">{new Date(viewingWorkflow.created_date).toLocaleDateString()}</div>
                 </div>
                 {viewingWorkflow.notes && (
-                  <div className="mt-4 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">"{viewingWorkflow.notes}"</div>
+                  <div className="mt-4 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">“{viewingWorkflow.notes}”</div>
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
       {/* ///////////////////// */}
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-hidden">
+        <>
           <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 z-[9998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setShowModal(false)}
           />
 
           <form
             onSubmit={handleSubmit}
-            className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden border border-white/20"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[9999] animate-in slide-in-from-right duration-300 overflow-y-auto"
           >
-            <div className="p-8 pb-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold">{isEditing ? 'Edit' : 'Create'} Workflow</h2>
-              <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
+            <div className="p-8 pb-4 flex justify-between items-center border-b border-slate-100">
+              <h2 className="text-2xl font-black text-slate-800">{isEditing ? 'Edit' : 'Create'} Workflow</h2>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+              >
                 <FiX size={20} />
               </button>
             </div>
 
-            <div className="px-8 pb-8 overflow-y-auto max-h-[60vh] space-y-4">
+            <div className="px-8 pb-8 space-y-4">
               <div>
                 <label className="block text-sm font-semibold mb-2 text-slate-700">Workflow Name</label>
                 <input
@@ -373,7 +388,7 @@ const WorkflowsTable = () => {
               </div>
             </div>
 
-            <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+            <div className="p-8 pt-4 bg-slate-50 border-t border-slate-100 flex gap-3 sticky bottom-0">
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
@@ -391,7 +406,7 @@ const WorkflowsTable = () => {
               </button>
             </div>
           </form>
-        </div>
+        </>
       )}
     </div>
   )

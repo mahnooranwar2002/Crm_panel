@@ -137,7 +137,7 @@ export function ProvidersTable() {
       </div>
       <button 
         onClick={() => setShowCreateModal(true)}
-        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 active:scale-95"
+        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 active:scale-95"
       >
         <FiPlus size={20} />
         Register New Provider
@@ -147,12 +147,12 @@ export function ProvidersTable() {
         {/* Toolbar */}
 <div className="flex flex-col md:flex-row gap-4 mb-8">
   <div className="flex-1 relative group">
-    <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+    <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
     <input
       type="text"
       // MRN ko hata kar NPI aur Specialty add kiya gaya hai
       placeholder="Search by name, specialty, or NPI number..." 
-      className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all shadow-sm font-medium"
+      className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none transition-all shadow-sm font-medium"
       value={searchQuery}
       onChange={(e) => handleSearch(e.target.value)}
     />
@@ -180,7 +180,7 @@ export function ProvidersTable() {
           <tr>
             <td colSpan={5} className="px-8 py-24 text-center">
               <div className="flex flex-col items-center">
-                <div className="animate-spin w-10 h-10 border-[3px] border-blue-100 border-t-blue-600 rounded-full mb-4"></div>
+                <div className="animate-spin w-10 h-10 border-[3px] border-indigo-100 border-t-indigo-600 rounded-full mb-4"></div>
                 <p className="text-slate-400 font-bold tracking-tight">Synchronizing clinical data...</p>
               </div>
             </td>
@@ -197,7 +197,7 @@ export function ProvidersTable() {
           </tr>
         ) : (
           filteredProviders.map((provider) => (
-            <tr key={provider.id} className="hover:bg-blue-50/40 transition-colors group cursor-default">
+            <tr key={provider.id} className="hover:bg-indigo-50/40 transition-colors group cursor-default">
               <td className="px-8 py-5">
                 <div className="flex items-center gap-4">
                   {/* Provider Initials Avatar */}
@@ -214,7 +214,7 @@ export function ProvidersTable() {
               </td>
               <td className="px-6 py-5">
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 w-fit">
+                  <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
                     NPI: {provider.npiNumber || 'Pending'}
                   </span>
                   {provider.licenseNumber && (
@@ -243,10 +243,10 @@ export function ProvidersTable() {
               </td>
               <td className="px-8 py-5 text-right">
                 <div className="flex justify-end items-center gap-2">
-                  <button onClick={() => setViewingProvider(provider)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
+                  <button onClick={() => setViewingProvider(provider)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
                     <FiUser size={18} />
                   </button>
-                  <button onClick={() => setEditingProvider(provider)} className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
+                  <button onClick={() => setEditingProvider(provider)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
                     <FiEdit2 size={18} />
                   </button>
                   <button onClick={() => handleDeleteProvider(provider.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
@@ -262,74 +262,47 @@ export function ProvidersTable() {
   </div>
 </div>
 
-      {/* --- MODALS SECTION --- */}
-      {showCreateModal && (
-        <ModalWrapper title="Register New Provider" onClose={() => setShowCreateModal(false)}>
-          <ProviderForm 
-            onSubmit={handleCreateProvider} 
-            onClose={() => setShowCreateModal(false)} 
-          />
-        </ModalWrapper>
-      )}
-
+      {/* --- VIEW PROVIDER SIDEBAR --- */}
       {viewingProvider && (
-        <ModalWrapper title="Provider Professional Profile" onClose={() => setViewingProvider(null)}>
-          <ProviderView 
-            provider={viewingProvider} 
-            onEdit={() => { 
-              setEditingProvider(viewingProvider); 
-              setViewingProvider(null); 
-            }} 
-          />
-        </ModalWrapper>
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setViewingProvider(null)} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Provider Details</h2>
+                <button onClick={() => setViewingProvider(null)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
+                  <FiX size={24} />
+                </button>
+              </div>
+              <ProviderView provider={viewingProvider} onEdit={() => { setEditingProvider(viewingProvider); setViewingProvider(null); }} />
+            </div>
+          </div>
+        </>
       )}
 
-      {editingProvider && (
-        <ModalWrapper title="Update Provider Credentials" onClose={() => setEditingProvider(null)}>
-          <ProviderForm 
-            provider={editingProvider} 
-            isEdit 
-            onSubmit={handleEditProvider} 
-            onClose={() => setEditingProvider(null)} 
-          />
-        </ModalWrapper>
+      {/* --- EDIT/CREATE PROVIDER SIDEBAR --- */}
+      {(showCreateModal || editingProvider) && (
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => { setShowCreateModal(false); setEditingProvider(null); }} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">{editingProvider ? 'Edit Provider' : 'Register Provider'}</h2>
+                <button onClick={() => { setShowCreateModal(false); setEditingProvider(null); }} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
+                  <FiX size={24} />
+                </button>
+              </div>
+              <ProviderForm provider={editingProvider} isEdit={!!editingProvider} onSubmit={editingProvider ? handleEditProvider : handleCreateProvider} onClose={() => { setShowCreateModal(false); setEditingProvider(null); }} />
+            </div>
+          </div>
+        </>
       )}
     </div>
   </div>
   )
 }
 
-// --- 2. MODAL WRAPPER (FOR GLASSUI) ---
-function ModalWrapper({ children, title, onClose }: { children: React.ReactNode, title: string, onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop with heavy blur for focus */}
-      <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl transition-opacity duration-300" 
-        onClick={onClose} 
-        aria-hidden="true"
-      />
-      
-      {/* Content Card with Glass UI effects */}
-      <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20 flex flex-col animate-in fade-in zoom-in duration-200">
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/50 backdrop-blur-md">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase text-[13px] tracking-[0.05em]">{title}</h2>
-          <button 
-            onClick={onClose} 
-            className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition-all active:scale-90"
-          >
-            <FiX size={24} />
-          </button>
-        </div>
-        
-        {/* Scrollable Content Area */}
-        <div className="p-8 overflow-y-auto custom-scrollbar">
-          {children}
-        </div>
-      </div>
-    </div>
-  )
-}
+
 
 // --- 3. REUSABLE FORM COMPONENT (CREATE/EDIT) ---
 export function ProviderForm({ provider, isEdit, onSubmit, onClose }: any) {
@@ -420,7 +393,7 @@ export function ProviderForm({ provider, isEdit, onSubmit, onClose }: any) {
 
       <div className="flex gap-4 pt-6">
         <button type="button" onClick={onClose} className="flex-1 py-4 px-6 border-2 border-slate-100 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all uppercase tracking-widest text-xs">Discard</button>
-        <button type="submit" disabled={loading} className="flex-[2] py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-blue-200 disabled:opacity-50 uppercase tracking-widest text-xs">
+        <button type="submit" disabled={loading} className="flex-[2] py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-indigo-200 disabled:opacity-50 uppercase tracking-widest text-xs">
           {loading ? 'Processing...' : isEdit ? 'Save Changes' : 'Confirm Registration'}
         </button>
       </div>
@@ -431,71 +404,56 @@ export function ProviderForm({ provider, isEdit, onSubmit, onClose }: any) {
 // --- 4. VIEW COMPONENT ---
 function ProviderView({ provider, onEdit }: any) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-6">
-        <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-[2rem] flex items-center justify-center font-black text-3xl border-2 border-white shadow-inner">
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-2xl">
           {(provider.firstName[0] || '') + (provider.lastName[0] || '')}
         </div>
         <div>
-          <h3 className="text-2xl font-black text-slate-900 leading-none">{provider.firstName} {provider.lastName}</h3>
-          <p className="text-blue-600 font-mono font-bold mt-2 text-sm tracking-tighter bg-blue-50 inline-block px-2 py-0.5 rounded-lg border border-blue-100">
-            ID: {provider.providerId}
-          </p>
-          <p className="text-slate-500 text-xs mt-1">Status: <span className="font-bold text-slate-700">{provider.status}</span></p>
+          <h3 className="text-xl font-black text-slate-900 leading-none">{provider.firstName} {provider.lastName}</h3>
+          <p className="text-indigo-600 font-mono text-xs font-bold mt-1">{provider.specialty}</p>
+          <p className="text-slate-500 text-xs mt-1">{provider.status}</p>
         </div>
       </div>
 
-      {/* Medical Credentials */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Medical Credentials</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <DetailCard icon={<FiBriefcase />} label="Specialty" value={provider.specialty} />
-          <DetailCard icon={<FiHash />} label="NPI" value={provider.npiNumber} />
-          <DetailCard label="License" value={provider.licenseNumber} />
-          <DetailCard label="License State" value={provider.licenseState} />
-          <DetailCard label="Taxonomy" value={provider.taxonomyCode || 'N/A'} />
-          <DetailCard icon={<FiActivity />} label="Status" value={provider.status} />
+      {/* Credentials */}
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">NPI Number</p>
+          <p className="font-bold text-slate-700">{provider.npiNumber}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">License Number</p>
+          <p className="font-bold text-slate-700">{provider.licenseNumber}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">License State</p>
+          <p className="font-bold text-slate-700">{provider.licenseState}</p>
         </div>
       </div>
 
-      {/* Contact Information */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Contact Information</h3>
-        <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-3">
-          <div className="flex items-center gap-3">
-            <FiPhone className="text-blue-500" />
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone</p>
-              <p className="font-bold text-slate-700">{provider.phone}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <FiMail className="text-blue-500" />
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</p>
-              <p className="font-bold text-slate-700">{provider.email || 'Not provided'}</p>
-            </div>
-          </div>
+      {/* Contact */}
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Phone</p>
+          <p className="font-bold text-slate-700">{provider.phone}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Email</p>
+          <p className="font-bold text-slate-700">{provider.email || 'Not provided'}</p>
         </div>
       </div>
 
-      {/* Facility Address */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Facility Address</h3>
-        <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-          <div className="flex items-start gap-3">
-            <FiMapPin className="text-blue-500 mt-1" />
-            <div>
-              <p className="font-bold text-slate-900">{provider.facilityAddress}</p>
-              <p className="text-sm text-slate-600 mt-1">{provider.facilityCity}, {provider.facilityState} {provider.facilityZipCode}</p>
-            </div>
-          </div>
-        </div>
+      {/* Facility */}
+      <div className="space-y-1">
+        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Facility Address</p>
+        <p className="font-bold text-slate-700 text-sm">{provider.facilityAddress}</p>
+        <p className="text-xs text-slate-600">{provider.facilityCity}, {provider.facilityState} {provider.facilityZipCode}</p>
       </div>
 
-      <button onClick={onEdit} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all">
-        Edit Provider Information
+      <button onClick={onEdit} className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-indigo-700 transition-all mt-4">
+        Edit Information
       </button>
     </div>
   )
@@ -510,7 +468,7 @@ function Input({ label, icon, ...props }: any) {
       </label>
       <input 
         {...props} 
-        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300" 
+        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300" 
       />
     </div>
   )
@@ -518,12 +476,12 @@ function Input({ label, icon, ...props }: any) {
 
 function DetailCard({ icon, label, value }: any) {
   return (
-    <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-blue-500">{icon}</span>
+    <div>
+      <div className="flex items-center gap-2">
+        <span className="text-indigo-500">{icon}</span>
         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
       </div>
-      <p className="font-bold text-slate-800 text-sm">{value}</p>
+      <p className="font-bold text-slate-800 text-sm mt-1">{value}</p>
     </div>
   )
 }
@@ -536,7 +494,7 @@ function SelectInput({ label, name, value, onChange, options }: any) {
         name={name}
         value={value} 
         onChange={onChange} 
-        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 transition-all"
+        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-slate-700 transition-all"
       >
         {options.map((opt: string) => (
           <option key={opt} value={opt}>{opt}</option>
@@ -576,7 +534,7 @@ export function ProviderDetail({ providerId }: { providerId: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-10 h-10 border-[3px] border-blue-100 border-t-blue-600 rounded-full"></div>
+        <div className="animate-spin w-10 h-10 border-[3px] border-indigo-100 border-t-indigo-600 rounded-full"></div>
       </div>
     )
   }

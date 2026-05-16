@@ -1,101 +1,6 @@
-// import React from 'react'
-// import { FiHome, FiDollarSign, FiCalendar, FiTool, FiCheckCircle, FiFileText } from 'react-icons/fi'
-
-// export default function RealEstateDashboard() {
-//   const stats = [
-//     { icon: FiHome, label: 'Total Properties', value: '24', color: '#21a9ff' },
-//     { icon: FiDollarSign, label: 'Total Budget', value: '$2.5M', color: '#4ade80' },
-//     { icon: FiCalendar, label: 'Active Projects', value: '8', color: '#8b5cf6' },
-//     { icon: FiCheckCircle, label: 'Completed Tasks', value: '45', color: '#f59e0b' }
-//   ]
-
-//   return (
-//     <div style={{ padding: '20px' }}>
-//       <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '10px' }}>Real Estate & Construction Management</h1>
-//       <p style={{ color: '#6b7280', marginBottom: '30px' }}>Manage properties, construction projects, and resources</p>
-
-//       <div style={{
-//         display: 'grid',
-//         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-//         gap: '20px',
-//         marginBottom: '40px'
-//       }}>
-//         {stats.map((stat, index) => {
-//           const IconComponent = stat.icon
-//           return (
-//             <div key={index} style={{
-//               padding: '20px',
-//               border: '1px solid #e5e7eb',
-//               borderRadius: '8px',
-//               backgroundColor: '#f9fafb'
-//             }}>
-//               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-//                 <div>
-//                   <p style={{ color: '#6b7280', fontSize: '13px', margin: '0 0 8px 0' }}>{stat.label}</p>
-//                   <p style={{ fontSize: '24px', fontWeight: '700', margin: '0', color: stat.color }}>{stat.value}</p>
-//                 </div>
-//                 <IconComponent size={24} color={stat.color} />
-//               </div>
-//             </div>
-//           )
-//         })}
-//       </div>
-
-//       <div style={{
-//         backgroundColor: 'white',
-//         padding: '20px',
-//         borderRadius: '8px',
-//         border: '1px solid #e5e7eb'
-//       }}>
-//         <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px' }}>Quick Start</h2>
-//         <div style={{
-//           display: 'grid',
-//           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-//           gap: '15px'
-//         }}>
-//           <button style={{
-//             padding: '12px 16px',
-//             border: '1px solid #e5e7eb',
-//             borderRadius: '6px',
-//             textAlign: 'left',
-//             cursor: 'pointer',
-//             backgroundColor: '#f9fafb',
-//             transition: 'all 0.2s'
-//           }}>
-//             <p style={{ fontWeight: '600', margin: '0 0 4px 0', fontSize: '14px' }}>🏠 Add New Property</p>
-//             <p style={{ color: '#6b7280', fontSize: '12px', margin: '0' }}>List a new property</p>
-//           </button>
-//           <button style={{
-//             padding: '12px 16px',
-//             border: '1px solid #e5e7eb',
-//             borderRadius: '6px',
-//             textAlign: 'left',
-//             cursor: 'pointer',
-//             backgroundColor: '#f9fafb'
-//           }}>
-//             <p style={{ fontWeight: '600', margin: '0 0 4px 0', fontSize: '14px' }}>🔨 Start New Project</p>
-//             <p style={{ color: '#6b7280', fontSize: '12px', margin: '0' }}>Create a construction project</p>
-//           </button>
-//           <button style={{
-//             padding: '12px 16px',
-//             border: '1px solid #e5e7eb',
-//             borderRadius: '6px',
-//             textAlign: 'left',
-//             cursor: 'pointer',
-//             backgroundColor: '#f9fafb'
-//           }}>
-//             <p style={{ fontWeight: '600', margin: '0 0 4px 0', fontSize: '14px' }}>📋 Schedule Inspection</p>
-//             <p style={{ color: '#6b7280', fontSize: '12px', margin: '0' }}>Book a site inspection</p>
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { 
   FiHome, 
   FiDollarSign, 
@@ -109,8 +14,148 @@ import {
   FiUsers
 } from 'react-icons/fi'
 import Link from 'next/link'
+import PropertyModal from './modals/PropertyModal'
+import ProjectModal from './modals/ProjectModal'
+import TaskModal from './modals/TaskModal'
+import ResourceModal from './modals/ResourceModal'
+import InspectionModal from './modals/InspectionModal'
+import PermitModal from './modals/PermitModal'
+import ScheduleVisitModal from './modals/ScheduleVisitModal'
+import NewContractModal from './modals/NewContractModal'
+import ManageTenantsModal from './modals/ManageTenantsModal'
+import FinancialReportModal from './modals/FinancialReportModal'
+import toast from 'react-hot-toast'
 
 export default function RealEstateDashboard() {
+  // Modal state management
+  const [modals, setModals] = useState({
+    addProperty: false,
+    startProject: false,
+    scheduleVisit: false,
+    newContract: false,
+    manageTenants: false,
+    financialReport: false,
+    // CRUD modals
+    propertyForm: false,
+    projectForm: false,
+    taskForm: false,
+    resourceForm: false,
+    inspectionForm: false,
+    permitForm: false
+  })
+
+  const [loading, setLoading] = useState(false)
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [selectedTask, setSelectedTask] = useState(null)
+  const [selectedResource, setSelectedResource] = useState(null)
+  const [selectedInspection, setSelectedInspection] = useState(null)
+  const [selectedPermit, setSelectedPermit] = useState(null)
+
+  // Modal toggler function
+  const toggleModal = (modalName: string, state: boolean = !modals[modalName as keyof typeof modals]) => {
+    setModals(prev => ({
+      ...prev,
+      [modalName]: state
+    }))
+  }
+
+  // Handlers for each modal
+  const handleAddProperty = (property: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Adding/Updating property:', property)
+      toast.success(selectedProperty ? 'Property updated!' : 'Property added!')
+      toggleModal('propertyForm', false)
+      setSelectedProperty(null)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleStartProject = (project: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Creating/Updating project:', project)
+      toast.success(selectedProject ? 'Project updated!' : 'Project started!')
+      toggleModal('projectForm', false)
+      setSelectedProject(null)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleCreateTask = (task: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Creating/Updating task:', task)
+      toast.success(selectedTask ? 'Task updated!' : 'Task created!')
+      toggleModal('taskForm', false)
+      setSelectedTask(null)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleAddResource = (resource: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Adding/Updating resource:', resource)
+      toast.success(selectedResource ? 'Resource updated!' : 'Resource added!')
+      toggleModal('resourceForm', false)
+      setSelectedResource(null)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleScheduleInspection = (inspection: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Scheduling inspection:', inspection)
+      toast.success(selectedInspection ? 'Inspection updated!' : 'Inspection scheduled!')
+      toggleModal('inspectionForm', false)
+      setSelectedInspection(null)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleAddPermit = (permit: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Adding/Updating permit:', permit)
+      toast.success(selectedPermit ? 'Permit updated!' : 'Permit added!')
+      toggleModal('permitForm', false)
+      setSelectedPermit(null)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleScheduleVisit = (visit: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Scheduling visit:', visit)
+      toast.success('Visit scheduled successfully!')
+      toggleModal('scheduleVisit', false)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleCreateContract = (contract: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Creating contract:', contract)
+      toast.success('Contract created successfully!')
+      toggleModal('newContract', false)
+      setLoading(false)
+    }, 500)
+  }
+
+  const handleAddTenant = (tenant: any) => {
+    setLoading(true)
+    setTimeout(() => {
+      console.log('Adding tenant:', tenant)
+      toast.success('Tenant added successfully!')
+      toggleModal('manageTenants', false)
+      setLoading(false)
+    }, 500)
+  }
   // Stats Data
   const stats = [
     { label: 'Total Properties', value: '24', icon: FiHome, color: 'bg-blue-50 text-blue-600' },
@@ -122,12 +167,12 @@ export default function RealEstateDashboard() {
   ]
 
   const quickActions = [
-    { title: 'Add Property', description: 'List a new property unit', icon: FiPlus, href: '/real-estate/properties/create', color: 'blue' },
-    { title: 'Start Project', description: 'Create construction plan', icon: FiTool, href: '/real-estate/projects/new', color: 'green' },
-    { title: 'Schedule Visit', description: 'Book a site inspection', icon: FiCalendar, href: '/real-estate/visits/book', color: 'purple' },
-    { title: 'New Contract', description: 'Generate legal agreement', icon: FiFileText, href: '/real-estate/contracts/new', color: 'amber' },
-    { title: 'Manage Tenants', description: 'View and edit tenant info', icon: FiUsers, href: '/real-estate/tenants', color: 'indigo' },
-    { title: 'Financial Report', description: 'Check ROI & expenses', icon: FiDollarSign, href: '/real-estate/reports/financial', color: 'pink' },
+    { title: 'Add Property', description: 'List a new property unit', icon: FiPlus, action: () => toggleModal('propertyForm', true), color: 'blue' },
+    { title: 'Start Project', description: 'Create construction plan', icon: FiTool, action: () => toggleModal('projectForm', true), color: 'green' },
+    { title: 'Schedule Visit', description: 'Book a site inspection', icon: FiCalendar, action: () => toggleModal('scheduleVisit', true), color: 'purple' },
+    { title: 'New Contract', description: 'Generate legal agreement', icon: FiFileText, action: () => toggleModal('newContract', true), color: 'amber' },
+    { title: 'Manage Tenants', description: 'View and edit tenant info', icon: FiUsers, action: () => toggleModal('manageTenants', true), color: 'indigo' },
+    { title: 'Financial Report', description: 'Check ROI & expenses', icon: FiDollarSign, action: () => toggleModal('financialReport', true), color: 'pink' },
   ]
 
   const modules = [
@@ -179,47 +224,120 @@ export default function RealEstateDashboard() {
             {quickActions.map((action) => {
               const Icon = action.icon
               return (
-                <Link key={action.title} href={action.href}>
-                  <div className={`bg-white rounded-xl border-2 border-transparent shadow-sm p-6 cursor-pointer transition-all hover:shadow-lg ${colorMap[action.color]}`}>
-                    <div className="flex items-center gap-5">
-                      <div className="p-4 bg-slate-50 rounded-xl text-slate-700">
-                        <Icon size={24} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-slate-900 text-lg mb-0.5">{action.title}</h3>
-                        <p className="text-sm text-slate-500 font-medium">{action.description}</p>
-                      </div>
+                <button
+                  key={action.title}
+                  onClick={action.action}
+                  className={`bg-white rounded-xl border-2 border-transparent shadow-sm p-6 cursor-pointer transition-all hover:shadow-lg text-left w-full ${colorMap[action.color]}`}
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="p-4 bg-slate-50 rounded-xl text-slate-700">
+                      <Icon size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-slate-900 text-lg mb-0.5">{action.title}</h3>
+                      <p className="text-sm text-slate-500 font-medium">{action.description}</p>
                     </div>
                   </div>
-                </Link>
+                </button>
               )
             })}
           </div>
         </div>
 
-        {/* Core Modules Section */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
-            <h2 className="text-xl font-bold text-slate-800">Operational Modules</h2>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-bold bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
-              Configure Portfolio
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-x divide-slate-100">
-            {modules.map((m, idx) => (
-              <div key={idx} className="p-6 hover:bg-slate-50 transition-colors group">
-                <h3 className="font-bold text-slate-900 mb-2">{m.title}</h3>
-                <p className="text-sm text-slate-500 mb-4 leading-relaxed">{m.description}</p>
-                <Link href={m.link} className="text-blue-600 text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                  Open Module <span>→</span>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* All Modals */}
+      <PropertyModal
+        isOpen={modals.propertyForm}
+        onClose={() => {
+          toggleModal('propertyForm', false)
+          setSelectedProperty(null)
+        }}
+        property={selectedProperty || undefined}
+        onSave={handleAddProperty}
+        loading={loading}
+      />
 
-      </div>
+      <ProjectModal
+        isOpen={modals.projectForm}
+        onClose={() => {
+          toggleModal('projectForm', false)
+          setSelectedProject(null)
+        }}
+        project={selectedProject || undefined}
+        onSave={handleStartProject}
+        loading={loading}
+      />
+
+      <TaskModal
+        isOpen={modals.taskForm}
+        onClose={() => {
+          toggleModal('taskForm', false)
+          setSelectedTask(null)
+        }}
+        task={selectedTask || undefined}
+        onSave={handleCreateTask}
+        loading={loading}
+      />
+
+      <ResourceModal
+        isOpen={modals.resourceForm}
+        onClose={() => {
+          toggleModal('resourceForm', false)
+          setSelectedResource(null)
+        }}
+        resource={selectedResource || undefined}
+        onSave={handleAddResource}
+        loading={loading}
+      />
+
+      <InspectionModal
+        isOpen={modals.inspectionForm}
+        onClose={() => {
+          toggleModal('inspectionForm', false)
+          setSelectedInspection(null)
+        }}
+        inspection={selectedInspection || undefined}
+        onSave={handleScheduleInspection}
+        loading={loading}
+      />
+
+      <PermitModal
+        isOpen={modals.permitForm}
+        onClose={() => {
+          toggleModal('permitForm', false)
+          setSelectedPermit(null)
+        }}
+        permit={selectedPermit || undefined}
+        onSave={handleAddPermit}
+        loading={loading}
+      />
+
+      <ScheduleVisitModal
+        isOpen={modals.scheduleVisit}
+        onClose={() => toggleModal('scheduleVisit', false)}
+        onSave={handleScheduleVisit}
+        loading={loading}
+      />
+
+      <NewContractModal
+        isOpen={modals.newContract}
+        onClose={() => toggleModal('newContract', false)}
+        onSave={handleCreateContract}
+        loading={loading}
+      />
+
+      <ManageTenantsModal
+        isOpen={modals.manageTenants}
+        onClose={() => toggleModal('manageTenants', false)}
+        onSave={handleAddTenant}
+        loading={loading}
+      />
+
+      <FinancialReportModal
+        isOpen={modals.financialReport}
+        onClose={() => toggleModal('financialReport', false)}
+        loading={loading}
+      />
+    </div>
     </div>
   )
 }

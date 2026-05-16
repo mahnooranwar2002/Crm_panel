@@ -383,158 +383,280 @@ const TaskDetails = () => {
         </div>
       </div>
 
-      {/* CREATE TASK MODAL */}
+      {/* CREATE TASK SIDEBAR */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[540px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center sticky top-0 bg-white">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Assign New Task</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
-                <FiX size={24} />
-              </button>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Assign New Task</h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateTask} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Name</label>
+                  <select
+                    required
+                    value={newTask.projectId}
+                    onChange={(e) => {
+                      const selectedProject = projects.find(p => p._id === e.target.value);
+                      setNewTask({
+                        ...newTask,
+                        projectId: e.target.value,
+                        projectName: selectedProject?.projectName || ''
+                      });
+                    }}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer"
+                  >
+                    <option value="">Select Project</option>
+                    {projects.map(project => (
+                      <option key={project._id} value={project._id}>
+                        {project.projectName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Task Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={newTask.taskTitle}
+                    onChange={(e) => setNewTask({ ...newTask, taskTitle: e.target.value })}
+                    placeholder="e.g. Setup Payment Gateway"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Assign To (Name)</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTask.assignedTo}
+                      onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
+                      placeholder="e.g. Ali Khan"
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Role</label>
+                    <select
+                      required
+                      value={newTask.role}
+                      onChange={(e) => setNewTask({ ...newTask, role: e.target.value })}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer"
+                    >
+                      <option value="Developer">Developer</option>
+                      <option value="Designer">Designer</option>
+                      <option value="Sales">Sales</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Description</label>
+                  <textarea
+                    required
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                    placeholder="Task description and details..."
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-20"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Priority</label>
+                    <select
+                      value={newTask.priority}
+                      onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Est. Hours</label>
+                    <input
+                      type="number"
+                      value={newTask.estimatedHours}
+                      onChange={(e) => setNewTask({ ...newTask, estimatedHours: parseInt(e.target.value) || 0 })}
+                      placeholder="Hours"
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={newTask.timeline}
+                      onChange={(e) => setNewTask({ ...newTask, timeline: e.target.value })}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Submission Deadline</label>
+                    <input
+                      type="date"
+                      required
+                      value={newTask.submissionDeadline}
+                      onChange={(e) => setNewTask({ ...newTask, submissionDeadline: e.target.value })}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Assigned By (Manager)</label>
+                  <input
+                    type="text"
+                    required
+                    value={newTask.assignedBy}
+                    onChange={(e) => setNewTask({ ...newTask, assignedBy: e.target.value })}
+                    placeholder="e.g. Mam Mahnoor"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Additional Notes</label>
+                  <textarea
+                    value={newTask.notes}
+                    onChange={(e) => setNewTask({ ...newTask, notes: e.target.value })}
+                    placeholder="Any additional notes or requirements..."
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-16"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]"
+                >
+                  Assign Task
+                </button>
+              </form>
             </div>
-            <form onSubmit={handleCreateTask} className="px-10 pb-10 space-y-4">
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Name</label>
-                <select required value={newTask.projectId} onChange={(e) => {
-                  const selectedProject = projects.find(p => p._id === e.target.value);
-                  setNewTask({
-                    ...newTask, 
-                    projectId: e.target.value,
-                    projectName: selectedProject?.projectName || ''
-                  });
-                }} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer">
-                  <option value="">Select Project</option>
-                  {projects.map(project => (
-                    <option key={project._id} value={project._id}>
-                      {project.projectName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Task Title</label>
-                <input type="text" required value={newTask.taskTitle} onChange={(e) => setNewTask({...newTask, taskTitle: e.target.value})} placeholder="e.g. Setup Payment Gateway" className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Assign To (Name)</label>
-                  <input type="text" required value={newTask.assignedTo} onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})} placeholder="e.g. Ali Khan" className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Role</label>
-                  <select required value={newTask.role} onChange={(e) => setNewTask({...newTask, role: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer">
-                    <option value="Developer">Developer</option>
-                    <option value="Designer">Designer</option>
-                    <option value="Sales">Sales</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Description</label>
-                <textarea required value={newTask.description} onChange={(e) => setNewTask({...newTask, description: e.target.value})} placeholder="Task description and details..." className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-20" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Priority</label>
-                  <select value={newTask.priority} onChange={(e) => setNewTask({...newTask, priority: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer">
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Critical">Critical</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Est. Hours</label>
-                  <input type="number" value={newTask.estimatedHours} onChange={(e) => setNewTask({...newTask, estimatedHours: parseInt(e.target.value) || 0})} placeholder="Hours" className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
-                  <input type="date" value={newTask.timeline} onChange={(e) => setNewTask({...newTask, timeline: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Submission Deadline</label>
-                  <input type="date" required value={newTask.submissionDeadline} onChange={(e) => setNewTask({...newTask, submissionDeadline: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Assigned By (Manager)</label>
-                <input type="text" required value={newTask.assignedBy} onChange={(e) => setNewTask({...newTask, assignedBy: e.target.value})} placeholder="e.g. Mam Mahnoor" className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Additional Notes</label>
-                <textarea value={newTask.notes} onChange={(e) => setNewTask({...newTask, notes: e.target.value})} placeholder="Any additional notes or requirements..." className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-16" />
-              </div>
-
-              <button type="submit" className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]">
-                Assign Task
-              </button>
-            </form>
           </div>
-        </div>
+        </>
       )}
 
-      {/* EDIT TASK MODAL */}
+      {/* EDIT TASK SIDEBAR */}
       {isEditModalOpen && editTaskData && (
-        <div className="fixed inset-0 text-black z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[540px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center sticky top-0 bg-white">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Update Task</h2>
-              <button onClick={() => setIsEditModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
-                <FiX size={24} />
-              </button>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsEditModalOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Update Task</h2>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateTask} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Task Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={editTaskData.taskTitle}
+                    onChange={(e) => setEditTaskData({ ...editTaskData, taskTitle: e.target.value })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Assigned To</label>
+                  <input
+                    type="text"
+                    required
+                    value={editTaskData.assignedTo}
+                    onChange={(e) => setEditTaskData({ ...editTaskData, assignedTo: e.target.value })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Completion Progress (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={editTaskData.completedPercentage}
+                    onChange={(e) => setEditTaskData({ ...editTaskData, completedPercentage: parseInt(e.target.value) || 0 })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Status</label>
+                  <select
+                    value={editTaskData.status}
+                    onChange={(e) => setEditTaskData({ ...editTaskData, status: e.target.value })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer"
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Submission Deadline</label>
+                  <input
+                    type="date"
+                    required
+                    value={editTaskData.submissionDeadline}
+                    onChange={(e) => setEditTaskData({ ...editTaskData, submissionDeadline: e.target.value })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Notes</label>
+                  <textarea
+                    value={editTaskData.notes}
+                    onChange={(e) => setEditTaskData({ ...editTaskData, notes: e.target.value })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-20"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]"
+                >
+                  Update Task
+                </button>
+              </form>
             </div>
-            <form onSubmit={handleUpdateTask} className="px-10 pb-10 space-y-4">
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Task Title</label>
-                <input type="text" required value={editTaskData.taskTitle} onChange={(e) => setEditTaskData({...editTaskData, taskTitle: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Assigned To</label>
-                <input type="text" required value={editTaskData.assignedTo} onChange={(e) => setEditTaskData({...editTaskData, assignedTo: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Completion Progress (%)</label>
-                <input type="number" min="0" max="100" value={editTaskData.completedPercentage} onChange={(e) => setEditTaskData({...editTaskData, completedPercentage: parseInt(e.target.value) || 0})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Status</label>
-                <select value={editTaskData.status} onChange={(e) => setEditTaskData({...editTaskData, status: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm cursor-pointer">
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Submission Deadline</label>
-                <input type="date" required value={editTaskData.submissionDeadline} onChange={(e) => setEditTaskData({...editTaskData, submissionDeadline: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Notes</label>
-                <textarea value={editTaskData.notes} onChange={(e) => setEditTaskData({...editTaskData, notes: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-20" />
-              </div>
-
-              <button type="submit" className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]">
-                Update Task
-              </button>
-            </form>
           </div>
-        </div>
+        </>
       )}
 
       <Toaster position="top-right" reverseOrder={false} />

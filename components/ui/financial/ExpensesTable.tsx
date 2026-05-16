@@ -225,66 +225,118 @@ const ExpensesTable = () => {
         </div>
       </div>
 
-      {/* VIEW CARD (Glassmorphism) */}
+      {/* --- View Sidebar --- */}
       {viewingExpense && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setViewingExpense(null)} />
-          <div className="relative bg-white/90 backdrop-blur-2xl rounded-[3rem] shadow-2xl w-full max-w-lg border border-white/20 overflow-hidden">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-8">
-                <div>
-                  <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingExpense.status)}`}>
-                    {viewingExpense.status}
-                  </span>
-                  <h2 className="text-4xl font-black text-slate-900 mt-4 leading-tight">{viewingExpense.expense_name}</h2>
-                </div>
-                <button onClick={() => setViewingExpense(null)} className="p-3 bg-slate-100 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewingExpense(null)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">
+                  Expense Details
+                </h2>
+                <button
+                  onClick={() => setViewingExpense(null)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
                   <FiX size={24} />
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Total Amount</p>
-                  <p className="text-3xl font-black text-blue-600">${viewingExpense.amount}</p>
-                  <p className="text-xs font-bold text-slate-400 mt-1">{viewingExpense.currency}</p>
-                </div>
-                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm text-center flex flex-col justify-center">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Category</p>
-                  <p className="text-xl font-black text-slate-700">{viewingExpense.category}</p>
-                </div>
-              </div>
+              <div className="space-y-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getStatusColor(viewingExpense.status)}`}
+                >
+                  {viewingExpense.status}
+                </span>
 
-              <div className="space-y-4 px-2">
-                <div className="flex justify-between text-sm py-3 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-widest">Date</span>
-                  <span className="font-black text-slate-700">{new Date(viewingExpense.expense_date).toLocaleDateString()}</span>
+                <p className="text-2xl font-black text-slate-900">
+                  {viewingExpense.expense_name}
+                </p>
+
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                    Total Amount
+                  </p>
+                  <p className="text-3xl font-black text-blue-600">
+                    ${viewingExpense.amount}
+                  </p>
+                  <p className="text-xs font-bold text-slate-400 mt-1">
+                    {viewingExpense.currency}
+                  </p>
                 </div>
-                <div className="flex justify-between text-sm py-3 border-b border-slate-100">
-                  <span className="font-bold text-slate-400 uppercase text-[10px] tracking-widest">Submitted By</span>
-                  <span className="font-black text-slate-700">{viewingExpense.submitted_by}</span>
+
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                    Category
+                  </p>
+                  <p className="text-xl font-black text-slate-700">
+                    {viewingExpense.category}
+                  </p>
                 </div>
-                {viewingExpense.notes && (
-                  <div className="mt-6">
-                    <p className="font-bold text-slate-400 uppercase text-[10px] tracking-widest mb-2">Notes</p>
-                    <p className="text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-2xl italic font-medium">"{viewingExpense.notes}"</p>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      Date
+                    </p>
+                    <p className="font-black text-slate-700">
+                      {new Date(viewingExpense.expense_date).toLocaleDateString()}
+                    </p>
                   </div>
-                )}
-              </div>
 
+                  <div className="flex justify-between items-center">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      Submitted By
+                    </p>
+                    <p className="font-black text-slate-700">
+                      {viewingExpense.submitted_by}
+                    </p>
+                  </div>
+
+                  {viewingExpense.notes && (
+                    <div className="mt-4 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">
+                      "{viewingExpense.notes}"
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setViewingExpense(null)}
+                  className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* CREATE/EDIT MODAL (Logic Restored) */}
+      {/* CREATE/EDIT SIDEBAR */}
       {showModal && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setShowModal(false)} />
-          <div className="relative bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden border border-white/20">
-            <div className="p-10">
-              <h2 className="text-2xl font-black mb-8 text-slate-900">{isEditing ? 'Modify Expense' : 'Create New Expense'}</h2>
-              
+        <>
+          <div
+            className="fixed inset-0 z-[109] bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setShowModal(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[110] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">
+                  {isEditing ? 'Edit Expense' : 'Add New Expense'}
+                </h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
+
               <div className="space-y-5">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Expense Label *</label>
@@ -344,13 +396,13 @@ const ExpensesTable = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Submitted By</label>
-                    <input
-                      type="text"
-                      value={formData.submitted_by}
-                      onChange={(e) => setFormData({ ...formData, submitted_by: e.target.value })}
-                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-slate-500"
-                    />
+                  <label className="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Submitted By</label>
+                  <input
+                    type="text"
+                    value={formData.submitted_by}
+                    onChange={(e) => setFormData({ ...formData, submitted_by: e.target.value })}
+                    className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-slate-500"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -366,12 +418,22 @@ const ExpensesTable = () => {
               </div>
 
               <div className="flex gap-4 mt-10">
-                <button onClick={() => setShowModal(false)} className="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 transition-colors">Cancel</button>
-                <button onClick={handleSave} className="flex-1 py-4 bg-[#21a9ff] text-white rounded-[1.5rem] font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all">Save Record</button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 py-4 bg-[#21a9ff] text-white rounded-[1.5rem] font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all"
+                >
+                  Save Record
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

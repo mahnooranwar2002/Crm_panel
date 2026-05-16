@@ -200,196 +200,185 @@ export function DenialsTable() {
         </div>
       </div>
 
-      {/* 1. VIEW DENIAL MODAL - Professional & Solid */}
+      {/* 1. VIEW DENIAL SIDEBAR */}
       {viewCardOpen && currentDenial && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60" onClick={() => setViewCardOpen(false)} />
-          
-          <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-              <div>
-                <h3 className="font-bold text-slate-800">Denial Details</h3>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Full Adjudication Info</p>
-              </div>
-              <button onClick={() => setViewCardOpen(false)} className="text-slate-400 hover:text-slate-600 p-1">
-                <FiX size={20} />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-5">
-              {/* Amount Header */}
-              <div className="bg-rose-50 p-4 rounded-xl border border-rose-100 flex items-center gap-4">
-                <div className="p-2 bg-white rounded-lg text-rose-600 shadow-sm">
-                   <FiAlertCircle size={20} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-rose-600 uppercase mb-0.5">Denial Amount</label>
-                  <p className="text-2xl font-black text-rose-900">${currentDenial.amount.toFixed(2)}</p>
-                </div>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewCardOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Denial Details</h2>
+                <button
+                  onClick={() => setViewCardOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
               </div>
 
-              {/* Data Grid */}
-              <div className="grid grid-cols-2 gap-y-5 gap-x-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Claim ID</label>
-                  <p className="font-mono text-sm font-bold text-slate-700 bg-slate-50 px-2 py-1 rounded inline-block">{currentDenial.claimId}</p>
+              <div className="space-y-4">
+                <div className="bg-rose-50 p-4 rounded-xl border border-rose-100 flex items-center gap-4">
+                  <div className="p-2 bg-white rounded-lg text-rose-600 shadow-sm">
+                    <FiAlertCircle size={20} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-rose-600 uppercase mb-0.5">Denial Amount</label>
+                    <p className="text-2xl font-black text-rose-900">${currentDenial.amount.toFixed(2)}</p>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Reason Code</label>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Claim ID</label>
+                  <p className="font-mono text-sm font-bold text-slate-700">{currentDenial.claimId}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Reason Code</label>
                   <p className="font-bold text-slate-700">{currentDenial.reasonCode}</p>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Patient</label>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Patient</label>
                   <p className="font-semibold text-slate-700">{currentDenial.patient}</p>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Payer</label>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Payer</label>
                   <p className="font-semibold text-slate-700">{currentDenial.payer}</p>
                 </div>
-              </div>
 
-              <div className="pt-2">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Denial Reason</label>
-                <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
-                  {currentDenial.reason}
-                </p>
-              </div>
+                <div className="pt-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Denial Reason</label>
+                  <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
+                    {currentDenial.reason}
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Appeal Status</label>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Appeal Status</label>
                   <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase ${getAppealStatusColor(currentDenial.appealStatus)}`}>
                     {currentDenial.appealStatus}
                   </span>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Deadline</label>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Deadline</label>
                   <p className="text-sm font-bold text-slate-700">{currentDenial.deadline}</p>
                 </div>
               </div>
             </div>
-
-            <div className="p-4 bg-slate-50 text-right border-t border-slate-100">
-              <button onClick={() => setViewCardOpen(false)} className="px-6 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition-all">
-                Close Preview
-              </button>
-            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* 2. ADD/EDIT DENIAL MODAL - Clean & Robust */}
+      {/* 2. ADD/EDIT DENIAL SIDEBAR */}
       {showModal && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60" onClick={handleCloseModal} />
-          
-          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col animate-in fade-in zoom-in-95 duration-200">
-            
-            {/* Header */}
-            <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
-              <h2 className="text-xl font-bold text-slate-900">
-                {editingId ? 'Edit Denial Record' : 'Add New Denial'}
-              </h2>
-              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600 p-1">
-                <FiX size={22} />
-              </button>
-            </div>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={handleCloseModal}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">
+                  {editingId ? 'Edit Denial' : 'Add Denial'}
+                </h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-8 space-y-5 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Claim ID</label>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Claim ID</label>
                   <input 
                     name="claimId"
                     value={formData.claimId}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     placeholder="e.g. CLM-202"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Patient Name</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Patient Name</label>
                   <input 
                     name="patient"
                     value={formData.patient}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Denial Reason</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Denial Reason</label>
                   <input 
                     name="reason"
                     value={formData.reason}
                     onChange={handleInputChange}
                     placeholder="e.g. Missing Documentation"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Reason Code</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Reason Code</label>
                   <input 
                     name="reasonCode"
                     value={formData.reasonCode}
                     onChange={handleInputChange}
                     placeholder="e.g. CO-16"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Denied Amount ($)</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Denied Amount ($)</label>
                   <input 
                     type="number"
                     name="amount"
                     value={formData.amount}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none font-semibold text-rose-600"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Insurance Payer</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Insurance Payer</label>
                   <input 
                     name="payer"
                     value={formData.payer}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Appeal Deadline</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Appeal Deadline</label>
                   <input 
                     type="date"
                     name="deadline"
                     value={formData.deadline}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Appeal Status</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Appeal Status</label>
                   <select 
                     name="appealStatus"
                     value={formData.appealStatus}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm focus:border-blue-500 focus:bg-white transition-all">
                     <option>Not Appealed</option>
                     <option>Appealed - Level 1</option>
                     <option>Appealed - Level 2</option>
@@ -397,19 +386,14 @@ export function DenialsTable() {
                     <option>Appeal Withdrawn</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-all">
+                <button type="submit" className="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-3 rounded-2xl transition-all shadow-lg shadow-rose-100 active:scale-95">
                   {editingId ? 'Update Record' : 'Add Denial'}
                 </button>
-                <button type="button" onClick={handleCloseModal} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition-all">
-                  Cancel
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
       </div>
 )}      

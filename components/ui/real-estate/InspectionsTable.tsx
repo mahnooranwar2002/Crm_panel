@@ -1,290 +1,373 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { 
-  FiEye, FiEdit2, FiTrash2, FiPlus, FiSearch, FiLoader, 
-  FiX, FiCalendar, FiUser, FiClipboard, FiShield, FiCheckCircle, FiAlertCircle 
+  FiPlus, FiEdit2, FiTrash2, FiSearch, 
+  FiFilter, FiCalendar, FiLoader, FiX, FiCheckCircle, FiAlertCircle, FiShield, FiUser, FiClipboard, FiEye
 } from 'react-icons/fi';
 import { inspectionService } from '@/src/services/real-estate/inspectionService';
+import InspectionModal from './modals/InspectionModal';
 import toast, { Toaster } from 'react-hot-toast';
+
+interface Finding {
+  issue: string;
+  severity: string;
+  status: string;
+  solution: string;
+}
 
 interface Inspection {
   _id?: string;
+  project_id?: string;
   inspection_date: string;
   inspection_type: string;
   status: string;
   passed: boolean;
   inspector_name?: string;
-  findings?: any[];
+  findings?: Finding[];
+  notes?: string;
+  photo_urls?: string[];
 }
 
-const InspectionsTable = () => {
+export default function InspectionsTable() {
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [filteredInspections, setFilteredInspections] = useState<Inspection[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false); 
   const [editingInspection, setEditingInspection] = useState<Inspection | null>(null);
-  
-  const [formData, setFormData] = useState({
-    inspection_date: new Date().toISOString().split('T')[0],
-    inspection_type: 'Safety',
-    passed: true,
-    status: 'Pending',
-    inspector_name: '',
-    findings: [] as any[],
-  });
+  const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null); 
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     fetchInspections();
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm, inspections]);
+
   const fetchInspections = async () => {
     try {
       setLoading(true);
-      const data = await inspectionService.getInspections();
+      const res = await inspectionService.getInspections() as any;
+      const data = Array.isArray(res) ? res : res?.data || [];
       setInspections(data);
       setFilteredInspections(data);
     } catch (err) {
-      toast.error("Failed to fetch inspections");
+      console.error("Error fetching inspections:", err);
+      toast.error("Failed to sync structural inspections logs");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const filtered = inspections.filter((i) => 
-      i.inspection_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      i.inspector_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredInspections(filtered);
-  }, [searchTerm, inspections]);
-
-  const handleSaveInspection = async () => {
-    if (!formData.inspection_date) {
-      toast.error('Inspection date is required');
+  const handleSearch = (query: string) => {
+    if (!query.trim()) {
+      setFilteredInspections(inspections);
       return;
     }
+    const filtered = inspections.filter((i) => 
+      i.inspector_name?.toLowerCase().includes(query.toLowerCase()) ||
+      i.inspection_type?.toLowerCase().includes(query.toLowerCase()) ||
+      i.status?.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredInspections(filtered);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this audit inspection record?')) return;
     try {
-      if (editingInspection) {
-        await inspectionService.updateInspection(editingInspection._id!, formData);
-        toast.success('Inspection updated successfully');
-      } else {
-        await inspectionService.createInspection(formData);
-        toast.success('Inspection created successfully');
-      }
-      setShowForm(false);
+      await inspectionService.deleteInspection(id);
+      toast.success('Inspection audit logs deleted');
       fetchInspections();
     } catch (err) {
-      toast.error('Failed to save inspection');
+      toast.error('Failed to clear inspection log');
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const styles: any = {
-      'Approved': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-      'Failed': 'bg-rose-50 text-rose-600 border-rose-100',
-      'Pending': 'bg-amber-50 text-amber-600 border-amber-100',
-      'Reopened': 'bg-purple-50 text-purple-600 border-purple-100',
-    };
-    return styles[status] || 'bg-slate-50 text-slate-500';
+  const handleAddInspection = () => {
+    setEditingInspection(null);
+    setShowModal(true);
+  };
+
+  const handleEditInspection = (inspection: Inspection) => {
+    setEditingInspection(inspection);
+    setShowModal(true);
+  };
+
+  const handleSaveInspection = async (inspection: Inspection) => {
+    try {
+      setIsSaving(true);
+      if (editingInspection && editingInspection._id) {
+        await inspectionService.updateInspection(editingInspection._id, inspection);
+        toast.success('Inspection verification logs updated');
+      } else {
+        await inspectionService.createInspection(inspection);
+        toast.success('New project inspection recorded');
+      }
+      setShowModal(false);
+      fetchInspections();
+    } catch (err) {
+      toast.error('Failed to save inspection report details');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getStatusClass = (status: string) => {
+    switch(status) {
+      case 'Approved': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+      case 'Failed': return 'bg-rose-50 text-rose-700 border-rose-100';
+      case 'Pending': return 'bg-amber-50 text-amber-700 border-amber-100';
+      case 'Reopened': return 'bg-blue-50 text-blue-700 border-blue-100';
+      default: return 'bg-slate-50 text-slate-700 border-slate-100';
+    }
   };
 
   return (
-    <div className="w-full bg-[#fcfdfe] min-h-screen p-4 md:p-10 font-sans">
+    <div className="w-full bg-[#fcfdfe] min-h-screen p-4 md:p-10 text-slate-900 font-sans relative overflow-x-hidden">
       <Toaster />
       
       <div className="max-w-7xl mx-auto">
-        {/* Header Section[cite: 6] */}
+        {/* Upper Layout Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Site Inspections</h1>
-            <p className="text-slate-500 font-medium mt-1">Audit logs for safety, quality, and compliance standards.</p>
+            <p className="text-slate-500 font-medium mt-1">
+              Verify real estate compliance criteria, safety audits, and dynamic contractor findings.
+              <span className="ml-2 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-bold">
+                {filteredInspections.length} Reports Checked
+              </span>
+            </p>
           </div>
           <button 
-            onClick={() => { setEditingInspection(null); setShowForm(true); }}
+            onClick={handleAddInspection}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 active:scale-95"
           >
-            <FiPlus size={20} /> New Inspection
+            <FiPlus size={20} />
+            Log New Audit
           </button>
         </div>
 
-        {/* Search Bar[cite: 6] */}
-        <div className="mb-8 relative group">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-          <input
-            type="text"
-            placeholder="Search by type or inspector name..."
-            className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all shadow-sm font-medium"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {/* Searching Filtering Actions Toolbar */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="flex-1 relative group">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by inspector name, audit type, compliance status..."
+              className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none shadow-sm font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button className="flex items-center justify-center gap-2 px-6 bg-white border border-slate-200 rounded-2xl text-slate-600 font-bold hover:bg-slate-50 transition-all shadow-sm">
+            <FiFilter /> Filters
+          </button>
         </div>
 
-        {/* Inspections Table Card[cite: 6] */}
+        {/* Table Structure Container layout */}
         <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100/50 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Audit Details</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Inspector</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Result</th>
-                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
+                  <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Audit Type & Inspector</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Inspection Date</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Compliance Status</th>
+                  <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Discovered Violations</th>
                   <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-8 py-20 text-center">
-                      <FiLoader className="animate-spin mx-auto text-blue-600" size={30} />
+                    <td colSpan={5} className="px-8 py-24 text-center">
+                      <div className="flex flex-col items-center">
+                        <FiLoader className="animate-spin w-10 h-10 text-blue-600 mb-4" size={32} />
+                        <p className="text-slate-400 font-bold tracking-tight">Syncing Operational Site Reports...</p>
+                      </div>
                     </td>
                   </tr>
-                ) : filteredInspections.map((inspection) => (
-                  <tr key={inspection._id} className="hover:bg-blue-50/40 transition-colors group">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-blue-600 border border-slate-100">
-                          <FiShield size={20} />
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900">{inspection.inspection_type}</p>
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
-                            <FiCalendar size={12} />
-                            {new Date(inspection.inspection_date).toLocaleDateString()}
+                ) : filteredInspections.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-24 text-center">
+                      <div className="flex flex-col items-center opacity-40">
+                        <FiShield size={60} className="text-slate-300 mb-4" />
+                        <p className="text-xl font-bold text-slate-900">No Compliance Audits Logged</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredInspections.map((item) => (
+                    <tr key={item._id} className="hover:bg-blue-50/40 transition-colors group">
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                            <FiShield size={18} className={item.passed ? 'text-emerald-600' : 'text-rose-600'} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900 text-base">{item.inspection_type} Inspection</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase mt-0.5">By: {item.inspector_name || 'Anonymous Auditor'}</p>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-black">
-                          {inspection.inspector_name?.charAt(0) || 'N'}
+                      </td>
+                      <td className="px-6 py-5 text-sm font-semibold text-slate-600">
+                        {item.inspection_date ? new Date(item.inspection_date).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${getStatusClass(item.status)}`}>
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2">
+                          {item.passed ? (
+                            <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
+                              <FiCheckCircle size={12} /> Clear Compliance
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-lg">
+                              <FiAlertCircle size={12} /> Violations Spotted ({item.findings?.length || 0})
+                            </span>
+                          )}
                         </div>
-                        <span className="text-sm font-bold text-slate-700">{inspection.inspector_name || 'Not Assigned'}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      {inspection.passed ? (
-                        <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-sm">
-                          <FiCheckCircle /> Passed
+                      </td>
+                      <td className="px-8 py-5 text-right">
+                        <div className="flex justify-end items-center gap-2">
+                          <button 
+                            onClick={() => setSelectedInspection(item)}
+                            className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm"
+                            title="Detailed Audit View"
+                          >
+                            <FiClipboard size={18} />
+                          </button>
+                          <button 
+                            onClick={() => handleEditInspection(item)}
+                            className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm"
+                          >
+                            <FiEdit2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => item._id && handleDelete(item._id)}
+                            className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm"
+                          >
+                            <FiTrash2 size={18} />
+                          </button>
                         </div>
-                      ) : (
-                        <div className="flex items-center gap-1.5 text-rose-600 font-bold text-sm">
-                          <FiAlertCircle /> Failed
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase border tracking-wider ${getStatusBadge(inspection.status)}`}>
-                        {inspection.status}
-                      </span>
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
-                          <FiEye size={16} />
-                        </button>
-                        <button onClick={() => { setEditingInspection(inspection); setFormData(inspection as any); setShowForm(true); }} className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
-                          <FiEdit2 size={16} />
-                        </button>
-                        <button onClick={() => inspection._id && inspectionService.deleteInspection(inspection._id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
-                          <FiTrash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      {/* Glassmorphism Form Modal[cite: 6] */}
-      {showForm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowForm(false)} />
-          <div className="relative bg-white/95 backdrop-blur-xl border border-white w-full max-w-xl rounded-[2.5rem] shadow-2xl p-8 md:p-10">
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-2xl font-bold text-slate-900">{editingInspection ? 'Update Inspection' : 'Log New Audit'}</h3>
-              <button onClick={() => setShowForm(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                <FiX size={24} />
+      {/* View Sidebar Summary Context Drawer Sheet */}
+      {selectedInspection && (
+        <div className="fixed inset-0 z-[9999] overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-slate-950/40 backdrop-blur-md transition-opacity duration-300"
+            onClick={() => setSelectedInspection(null)}
+          />
+
+          <div className="absolute top-0 right-0 h-full w-full sm:w-[450px] bg-white/95 backdrop-blur-md border-l border-slate-200/50 shadow-2xl flex flex-col text-sm text-slate-900 animate-in slide-in-from-right duration-200">
+            {/* Summary Header */}
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
+              <h2 className="text-xl font-bold text-slate-900">Inspection Review</h2>
+              <button onClick={() => setSelectedInspection(null)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700">
+                <FiX size={20} />
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-5 mb-8">
-              <div className="col-span-2">
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Inspector Full Name</label>
-                <div className="relative">
-                  <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input 
-                    className="w-full pl-11 pr-5 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 outline-none font-bold"
-                    value={formData.inspector_name}
-                    onChange={(e) => setFormData({...formData, inspector_name: e.target.value})}
-                    placeholder="e.g. John Doe"
-                  />
+            {/* Scrollable Context Panel Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Inspection Context</span>
+                  <p className="font-bold text-slate-800 text-base">{selectedInspection.inspection_type} Audit</p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase border ${getStatusClass(selectedInspection.status)}`}>
+                  {selectedInspection.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Audit Date</span>
+                  <p className="font-semibold text-slate-800">{selectedInspection.inspection_date ? new Date(selectedInspection.inspection_date).toLocaleDateString() : 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Linked Project ID</span>
+                  <p className="font-mono font-bold text-slate-700">{selectedInspection.project_id || 'N/A'}</p>
                 </div>
               </div>
+
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Audit Date</label>
-                <input 
-                  type="date"
-                  className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl outline-none font-bold"
-                  value={formData.inspection_date}
-                  onChange={(e) => setFormData({...formData, inspection_date: e.target.value})}
-                />
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Inspector Sign-off</span>
+                <p className="font-bold text-slate-800 flex items-center gap-1.5"><FiUser className="text-slate-400" /> {selectedInspection.inspector_name || 'N/A'}</p>
               </div>
+
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Audit Type</label>
-                <select 
-                  className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl outline-none font-bold appearance-none"
-                  value={formData.inspection_type}
-                  onChange={(e) => setFormData({...formData, inspection_type: e.target.value})}
-                >
-                  <option>Safety</option>
-                  <option>Quality</option>
-                  <option>Progress</option>
-                  <option>Compliance</option>
-                </select>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Compliance Outcome</span>
+                {selectedInspection.passed ? (
+                  <p className="text-emerald-700 font-bold bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-100 w-fit">Passed Site Specifications</p>
+                ) : (
+                  <p className="text-rose-700 font-bold bg-rose-50 px-3 py-2 rounded-xl border border-rose-100 w-fit">Failed Operational Standard Rules</p>
+                )}
               </div>
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Final Result</label>
-                <select 
-                  className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl outline-none font-bold appearance-none"
-                  value={formData.passed ? 'Passed' : 'Failed'}
-                  onChange={(e) => setFormData({...formData, passed: e.target.value === 'Passed'})}
-                >
-                  <option value="Passed">Passed</option>
-                  <option value="Failed">Failed</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</label>
-                <select 
-                  className="w-full px-5 py-3.5 bg-white border border-slate-200 rounded-2xl outline-none font-bold appearance-none"
-                  value={formData.status}
-                  onChange={(e) => setFormData({...formData, status: e.target.value})}
-                >
-                  <option>Pending</option>
-                  <option>Approved</option>
-                  <option>Failed</option>
-                  <option>Reopened</option>
-                </select>
-              </div>
+
+              {selectedInspection.notes && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">General Observations</span>
+                  <p className="text-slate-600 leading-relaxed font-medium bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    {selectedInspection.notes}
+                  </p>
+                </div>
+              )}
+
+              {/* Discovered Breaches Logs Array */}
+              {selectedInspection.findings && selectedInspection.findings.length > 0 && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-2">Detailed Dynamic Breaches</span>
+                  <div className="space-y-2">
+                    {selectedInspection.findings.map((finding, index) => (
+                      <div key={index} className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-xs">
+                        <div className="flex justify-between font-bold text-slate-800 mb-1">
+                          <span>Issue: {finding.issue}</span>
+                          <span className="text-rose-600 bg-rose-50 px-1.5 rounded">{finding.severity}</span>
+                        </div>
+                        {finding.solution && <p className="text-slate-500 font-medium mt-0.5"><span className="font-bold text-slate-700">Solution:</span> {finding.solution}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <button 
-              onClick={handleSaveInspection}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-200 active:scale-[0.98]"
-            >
-              Submit Inspection Report
-            </button>
+            <div className="p-4 border-t border-slate-100 bg-white/50">
+              <button onClick={() => setSelectedInspection(null)} className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Connected Inspection Actions Sheet Component Modal Trigger */}
+      <InspectionModal
+        isOpen={showModal}
+        onClose={() => { setShowModal(false); setEditingInspection(null); }}
+        inspection={editingInspection || undefined}
+        onSave={handleSaveInspection}
+        loading={isSaving}
+      />
     </div>
   );
-};
-
-export default InspectionsTable;
+}

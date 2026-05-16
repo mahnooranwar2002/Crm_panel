@@ -202,17 +202,19 @@ const RolesTable = () => {
         </div>
       </div>
 
-      {/* CREATE ROLE MODAL */}
+      {/* CREATE ROLE SIDEBAR */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[440px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center">
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsModalOpen(false)} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+            <div className="pb-4 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-2xl font-black text-slate-800 tracking-tight">New Role</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
                 <FiX size={24} />
               </button>
             </div>
-            <form onSubmit={handleCreateRole} className="px-10 pb-10 space-y-6">
+            <form onSubmit={handleCreateRole} className="space-y-6">
               <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Role Title</label>
                 <input type="text" required value={newRoleName} onChange={(e) => setNewRoleName(e.target.value)} placeholder="e.g. Senior Manager" className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium" />
@@ -232,21 +234,24 @@ const RolesTable = () => {
                 Deploy Role
               </button>
             </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* EDIT ROLE MODAL */}
+      {/* EDIT ROLE SIDEBAR */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 text-black z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[440px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center">
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsEditModalOpen(false)} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto text-black">
+            <div className="p-8 space-y-6">
+            <div className="pb-4 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-2xl font-black text-slate-800 tracking-tight">Modify Role</h2>
               <button onClick={() => setIsEditModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
                 <FiX size={24} />
               </button>
             </div>
-            <form onSubmit={handleUpdateRole} className="px-10 pb-10 space-y-6">
+            <form onSubmit={handleUpdateRole} className="space-y-6">
               <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Update Title</label>
                 <input type="text" required value={editRoleName} onChange={(e) => setEditRoleName(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] outline-none text-slate-700 font-medium" />
@@ -266,8 +271,9 @@ const RolesTable = () => {
                 Update Security Profile
               </button>
             </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
       <Toaster position="top-right" reverseOrder={false} />
     </div>

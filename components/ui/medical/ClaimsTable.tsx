@@ -138,7 +138,7 @@ export function ClaimsTable() {
           </div>
           <button 
             onClick={() => handleOpenModal()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all font-bold">
+            className="bg-indigo-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all font-bold">
             <FiPlus size={20} />
             Generate Claim
           </button>
@@ -201,173 +201,164 @@ export function ClaimsTable() {
         </div>
       </div>
 
-      {/* 1. VIEW CARD MODAL - Simple & Clean */}
+      {/* 1. VIEW CLAIM SIDEBAR */}
       {viewCardOpen && currentClaim && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-          {/* Simple dark overlay */}
-          <div className="absolute inset-0 bg-slate-900/60" onClick={() => setViewCardOpen(false)} />
-          
-          <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="font-bold text-slate-800">Claim Details</h3>
-              <button onClick={() => setViewCardOpen(false)} className="text-slate-400 hover:text-slate-600">
-                <FiX size={20} />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-4">
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                <label className="block text-[10px] font-bold text-blue-600 uppercase mb-1">Claim Amount</label>
-                <p className="text-2xl font-black text-blue-900">${currentClaim.amount.toFixed(2)}</p>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewCardOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Claim Details</h2>
+                <button
+                  onClick={() => setViewCardOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Patient</label>
-                  <p className="font-semibold text-slate-700">{currentClaim.patient}</p>
+              <div className="space-y-4">
+                      <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                  <label className="block text-[10px] font-bold text-indigo-600 uppercase mb-1">Claim Amount</label>
+                  <p className="text-2xl font-black text-indigo-900">${currentClaim.amount.toFixed(2)}</p>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Status</label>
-                  <p className="font-semibold text-slate-700">{currentClaim.status}</p>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Patient</label>
+                  <p className="font-bold text-slate-700">{currentClaim.patient}</p>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Insurance</label>
-                  <p className="font-semibold text-slate-700">{currentClaim.insurance}</p>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</label>
+                  <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase inline-block ${getStatusColor(currentClaim.status)}`}>
+                    {currentClaim.status}
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Submitted</label>
-                  <p className="font-semibold text-slate-700">{currentClaim.submitted}</p>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Insurance</label>
+                  <p className="font-bold text-slate-700">{currentClaim.insurance}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Submitted</label>
+                  <p className="font-bold text-slate-700">{currentClaim.submitted}</p>
                 </div>
               </div>
-            </div>
-
-            <div className="p-4 bg-slate-50 text-right border-t border-slate-100">
-              <button onClick={() => setViewCardOpen(false)} className="px-5 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100">
-                Close
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* 2. EDIT/NEW MODAL - UI Clean Fix */}
+      {/* 2. EDIT/NEW CLAIM SIDEBAR */}
       {showModal && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-          {/* Overlay fix - No blur for cleaner look */}
-          <div className="absolute inset-0 bg-slate-900/60" onClick={handleCloseModal} />
-          
-          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
-            
-            {/* Clean White Header */}
-            <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white z-10">
-              <h2 className="text-xl font-bold text-slate-900">
-                {editingId ? 'Edit Claim' : 'Generate New Claim'}
-              </h2>
-              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600 p-1">
-                <FiX size={22} />
-              </button>
-            </div>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={handleCloseModal}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">
+                  {editingId ? 'Edit Claim' : 'Generate New Claim'}
+                </h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
 
-            {/* Scrollable Form */}
-            <form onSubmit={handleSubmit} className="p-8 space-y-5 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Encounter ID</label>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Encounter ID</label>
                   <input 
                     name="encounterID"
                     value={formData.encounterID}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-indigo-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Patient Name</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Patient Name</label>
                   <input 
                     name="patient"
                     value={formData.patient}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-indigo-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Healthcare Provider</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Healthcare Provider</label>
                   <input 
                     name="provider"
                     value={formData.provider}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-indigo-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Primary Insurance</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Primary Insurance</label>
                   <input 
                     name="insurance"
                     value={formData.insurance}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-indigo-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Amount ($)</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Amount ($)</label>
                   <input 
                     type="number"
                     name="amount"
                     value={formData.amount}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none font-semibold"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-indigo-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Date</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Date</label>
                   <input 
                     type="date"
                     name="submitted"
                     value={formData.submitted}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-indigo-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
                     required
                   />
                 </div>
-              </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Status</label>
+                  <select 
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm focus:border-indigo-500 focus:bg-white transition-all">
+                    <option>Draft</option>
+                    <option>Submitted</option>
+                    <option>Approved</option>
+                    <option>Denied</option>
+                  </select>
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Status</label>
-                <select 
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
-                  <option>Draft</option>
-                  <option>Submitted</option>
-                  <option>Approved</option>
-                  <option>Denied</option>
-                </select>
-              </div>
-
-              {/* Action Buttons inside form */}
-              <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-all">
+                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl transition-all shadow-lg shadow-indigo-100 active:scale-95">
                   {editingId ? 'Update Claim' : 'Generate Claim'}
                 </button>
-                <button type="button" onClick={handleCloseModal} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition-all">
-                  Cancel
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )

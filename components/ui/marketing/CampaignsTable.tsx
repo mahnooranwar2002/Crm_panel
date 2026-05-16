@@ -156,225 +156,253 @@ const CampaignsTable = () => {
       </div>
 
       {/* ///////////// */}
-      {/* VIEW DETAILS MODAL */}
+      {/* VIEW DETAILS SIDEBAR */}
       {viewingCampaigns && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setViewingCampaigns(null)} />
-          <div className="relative bg-white/90 backdrop-blur-2xl rounded-[3rem] shadow-2xl w-full max-w-lg border border-white/20 overflow-hidden transform transition-all animate-in zoom-in duration-300">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-8">
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingCampaigns.status)}`}>
-                  {viewingCampaigns.status}
-                </span>
-                <button onClick={() => setViewingCampaigns(null)} className="p-3 bg-slate-100 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewingCampaigns(null)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">{viewingCampaigns.campaign_name}</h2>
+                <button
+                  onClick={() => setViewingCampaigns(null)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
                   <FiX size={24} />
                 </button>
               </div>
 
-              <h2 className="text-4xl font-black text-slate-900 mb-2">{viewingCampaigns.campaign_name}</h2>
-              <p className="text-slate-500 font-medium mb-8">Created by {viewingCampaigns.created_by}</p>
+              <div className="space-y-4">
+                <div>
+                  <span className={`${getStatusColor(viewingCampaigns.status)} px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest`}>
+                    {viewingCampaigns.status}
+                  </span>
+                </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Campaign Type</p>
-                  <p className="text-lg font-black text-blue-600">{viewingCampaigns.campaign_type}</p>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Campaign Type</p>
+                  <p className="font-bold text-slate-800 text-lg">{viewingCampaigns.campaign_type}</p>
                 </div>
-                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm flex flex-col justify-center">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Recipients</p>
-                  <p className="text-lg font-black text-slate-700">{viewingCampaigns.recipient_count}/{viewingCampaigns.target_count}</p>
-                </div>
-              </div>
 
-              <div className="space-y-4 px-2 border-t border-slate-100 pt-6">
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Target Audience</div>
-                  <div className="font-black text-slate-700">{viewingCampaigns.target_audience}</div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Created By</p>
+                  <p className="font-bold text-slate-700">{viewingCampaigns.created_by}</p>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Start Date</div>
-                  <div className="font-black text-slate-700">{new Date(viewingCampaigns.start_date).toLocaleDateString()}</div>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Target Audience</p>
+                  <p className="font-bold text-slate-700">{viewingCampaigns.target_audience}</p>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Open Rate</div>
-                  <div className="font-black text-green-600">{viewingCampaigns.open_rate}%</div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Target Count</p>
+                    <p className="font-bold text-slate-700">{viewingCampaigns.target_count}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recipients</p>
+                    <p className="font-bold text-slate-700">{viewingCampaigns.recipient_count}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Click Rate</div>
-                  <div className="font-black text-blue-600">{viewingCampaigns.click_rate}%</div>
+
+                <div className="border-t border-slate-100 pt-4 space-y-2">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Performance Metrics</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Open Rate</span>
+                    <span className="font-bold text-green-600">{viewingCampaigns.open_rate}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Click Rate</span>
+                    <span className="font-bold text-blue-600">{viewingCampaigns.click_rate}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Conversion Rate</span>
+                    <span className="font-bold text-purple-600">{viewingCampaigns.conversion_rate}%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Conversion Rate</div>
-                  <div className="font-black text-purple-600">{viewingCampaigns.conversion_rate}%</div>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Start Date</p>
+                  <p className="font-bold text-slate-700">{new Date(viewingCampaigns.start_date).toLocaleDateString()}</p>
                 </div>
+
                 {viewingCampaigns.notes && (
-                  <div className="mt-4 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">"{viewingCampaigns.notes}"</div>
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Notes</p>
+                    <p className="text-sm text-slate-700 italic">"{viewingCampaigns.notes}"</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
       {/* ///////////// */}
 
-      {/* Modal */}
+      {/* CREATE/EDIT SIDEBAR */}
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-hidden">
+        <>
           <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setShowModal(false)}
           />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">{isEditing ? 'Edit' : 'Create'} Campaign</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden border border-white/20"
-          >
-            <div className="p-8 pb-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold">{isEditing ? 'Edit' : 'Create'} Campaign</h2>
-              <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
-                <FiX size={20} />
-              </button>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Campaign Name</label>
+                  <input
+                    type="text"
+                    name="campaign_name"
+                    value={formData.campaign_name}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    placeholder="Enter campaign name"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Type</label>
+                    <select
+                      name="campaign_type"
+                      value={formData.campaign_type}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm focus:border-[#21a9ff] focus:bg-white transition-all"
+                    >
+                      <option value="Email">Email</option>
+                      <option value="SMS">SMS</option>
+                      <option value="Social">Social</option>
+                      <option value="Push">Push</option>
+                      <option value="Multi-Channel">Multi-Channel</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Status</label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm focus:border-[#21a9ff] focus:bg-white transition-all"
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="Active">Active</option>
+                      <option value="Paused">Paused</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Target Audience</label>
+                  <input
+                    type="text"
+                    name="target_audience"
+                    value={formData.target_audience}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    placeholder="E.g., Active Customers"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Target Count</label>
+                    <input
+                      type="number"
+                      name="target_count"
+                      value={formData.target_count}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Recipients</label>
+                    <input
+                      type="number"
+                      name="recipient_count"
+                      value={formData.recipient_count}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Open %</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="open_rate"
+                      value={formData.open_rate}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Click %</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="click_rate"
+                      value={formData.click_rate}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Conv. %</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      name="conversion_rate"
+                      value={formData.conversion_rate}
+                      onChange={handleInputChange}
+                      className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Notes</label>
+                  <textarea
+                    name="notes"
+                    value={formData.notes || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm resize-none h-20"
+                    placeholder="Add any notes..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  {submitting && <FiLoader className="animate-spin" />}
+                  {isEditing ? 'Update Campaign' : 'Create Campaign'}
+                </button>
+              </form>
             </div>
-
-            <div className="px-8 pb-8 overflow-y-auto max-h-[60vh] space-y-4">
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-700">Campaign Name</label>
-                <input
-                  type="text"
-                  name="campaign_name"
-                  value={formData.campaign_name}
-                  onChange={handleInputChange}
-                  className={inputBase}
-                  placeholder="Enter campaign name"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Type</label>
-                  <select name="campaign_type" value={formData.campaign_type} onChange={handleInputChange} className={inputBase}>
-                    <option value="Email">Email</option>
-                    <option value="SMS">SMS</option>
-                    <option value="Social">Social</option>
-                    <option value="Push">Push</option>
-                    <option value="Multi-Channel">Multi-Channel</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Status</label>
-                  <select name="status" value={formData.status} onChange={handleInputChange} className={inputBase}>
-                    <option value="Draft">Draft</option>
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="Active">Active</option>
-                    <option value="Paused">Paused</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-700">Target Audience</label>
-                <input
-                  type="text"
-                  name="target_audience"
-                  value={formData.target_audience}
-                  onChange={handleInputChange}
-                  className={inputBase}
-                  placeholder="E.g., Active Customers"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Target Count</label>
-                  <input
-                    type="number"
-                    name="target_count"
-                    value={formData.target_count}
-                    onChange={handleInputChange}
-                    className={inputBase}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Recipients</label>
-                  <input
-                    type="number"
-                    name="recipient_count"
-                    value={formData.recipient_count}
-                    onChange={handleInputChange}
-                    className={inputBase}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Open Rate %</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    name="open_rate"
-                    value={formData.open_rate}
-                    onChange={handleInputChange}
-                    className={inputBase}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Click Rate %</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    name="click_rate"
-                    value={formData.click_rate}
-                    onChange={handleInputChange}
-                    className={inputBase}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-700">Conv. Rate %</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    name="conversion_rate"
-                    value={formData.conversion_rate}
-                    onChange={handleInputChange}
-                    className={inputBase}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-700">Notes</label>
-                <textarea
-                  name="notes"
-                  value={formData.notes || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  className={`${inputBase} resize-none`}
-                  rows={3}
-                  placeholder="Add any notes..."
-                />
-              </div>
-            </div>
-
-            <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-[#21a9ff] text-white hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
-              >
-                {submitting && <FiLoader className="animate-spin" />}
-                Save Campaign
-              </button>
-            </div>
-          </form>
-        </div>
+          </div>
+        </>
       )}
     </div>
   )

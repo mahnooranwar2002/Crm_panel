@@ -196,143 +196,191 @@ export function EncountersTable() {
 
       {/* 1. VIEW CARD MODAL (Clean & Simple) */}
       {viewCardOpen && currentEncounter && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">
-          {/* Solid Dark Overlay for focus */}
-          <div className="absolute inset-0 bg-slate-900/50" onClick={() => setViewCardOpen(false)} />
-          
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-            {/* Header - Simple Slate */}
-            <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="font-bold text-slate-800 tracking-tight">View Encounter Details</h3>
-              <button onClick={() => setViewCardOpen(false)} className="text-slate-400 hover:text-slate-600 p-1">
-                <FiX size={20} />
-              </button>
+  <div className="fixed inset-0 z-[1000] overflow-hidden">
+    {/* Dark Overlay */}
+    <div 
+      className="absolute inset-0 bg-slate-900/40 transition-opacity" 
+      onClick={() => setViewCardOpen(false)} 
+    />
+    
+    <div className="fixed inset-y-0 right-0 max-w-full flex">
+      {/* Sidebar Panel */}
+      <div className="relative w-screen max-w-md bg-white shadow-2xl flex flex-col border-l border-slate-200 h-full animate-in slide-in-from-right duration-300">
+        
+        {/* Sticky Header */}
+        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center justify-between z-10">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">Encounter Details</h2>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-tight">Visit Record View</p>
+          </div>
+          <button onClick={() => setViewCardOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
+            <FiX size={24} />
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+          {/* Highlighted Charge Section */}
+          <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+            <label className="block text-[10px] font-bold text-blue-600 uppercase mb-1 tracking-widest">Total Charge</label>
+            <p className="text-3xl font-black text-blue-900">${currentEncounter.charge.toFixed(2)}</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Patient Name</label>
+              <p className="text-lg font-bold text-slate-800">{currentEncounter.patient}</p>
             </div>
             
-            {/* Body */}
-            <div className="p-6 space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 bg-blue-50 p-4 rounded-xl">
-                  <label className="block text-[10px] font-bold text-blue-600 uppercase mb-1">Total Charge</label>
-                  <p className="text-2xl font-black text-blue-900">${currentEncounter.charge.toFixed(2)}</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Patient Name</label>
-                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.patient}</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Encounter Type</label>
-                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.encounterType}</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Date of Service</label>
-                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.date}</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase">Provider</label>
-                  <p className="text-sm font-semibold text-slate-700">{currentEncounter.provider}</p>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date of Service</label>
+                <p className="text-sm font-semibold text-slate-700">{currentEncounter.date}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Encounter Type</label>
+                <p className="text-sm font-semibold text-slate-700">{currentEncounter.encounterType}</p>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 text-right">
-              <button onClick={() => setViewCardOpen(false)} className="px-6 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100">
-                Close
-              </button>
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Provider</label>
+              <p className="text-sm font-semibold text-slate-700">{currentEncounter.provider}</p>
             </div>
+
+            {/* Optional: Chief Complaint for better view in sidebar */}
+            {currentEncounter.chiefComplaint && (
+              <div className="space-y-2 pt-4 border-t border-slate-100">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Chief Complaint</label>
+                <div className="bg-slate-50 p-4 rounded-xl text-sm text-slate-600 italic leading-relaxed">
+                  "{currentEncounter.chiefComplaint}"
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Footer Action */}
+        <div className="p-6 border-t border-slate-100 bg-slate-50">
+          <button 
+            onClick={() => setViewCardOpen(false)} 
+            className="w-full bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-100 transition-all shadow-sm"
+          >
+            Close Detail View
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* 2. EDIT MODAL (Clean Background & No Navbar Cut) */}
       {showModal && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-          {/* Clear backdrop - No heavy blur */}
-          <div className="absolute inset-0 bg-slate-900/60" onClick={handleCloseModal} />
-          
-          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
-            {/* Simple Sticky Header */}
-            <div className="sticky top-0 bg-white border-b border-slate-100 px-8 py-5 flex items-center justify-between z-10">
-              <h2 className="text-xl font-bold text-slate-900">
-                {editingId ? 'Edit Encounter' : 'New Encounter'}
-              </h2>
-              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600">
-                <FiX size={22} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Patient Name</label>
-                  <input 
-                    name="patient"
-                    value={formData.patient}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Provider</label>
-                  <input 
-                    name="provider"
-                    value={formData.provider}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Date</label>
-                  <input 
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg outline-none"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Charge ($)</label>
-                  <input 
-                    type="number"
-                    name="charge"
-                    value={formData.charge}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg outline-none font-bold"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-600 uppercase">Chief Complaint</label>
-                <textarea 
-                  name="chiefComplaint"
-                  value={formData.chiefComplaint}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg outline-none"
-                />
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">
-                  {editingId ? 'Update' : 'Create'}
-                </button>
-                <button type="button" onClick={handleCloseModal} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-lg font-bold">
-                  Cancel
-                </button>
-              </div>
-            </form>
+  <div className="fixed inset-0 z-1000 overflow-hidden">
+    {/* Background Overlay - Simple Fade */}
+    <div 
+      className="absolute inset-0 bg-slate-900/40 transition-opacity cursor-pointer" 
+      onClick={handleCloseModal} 
+    />
+    
+    <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+      {/* Sidebar Panel */}
+      <div className="relative w-screen max-w-md bg-white shadow-2xl flex flex-col border-l border-slate-200 h-full animate-in slide-in-from-right duration-300">
+        
+        {/* Sticky Header */}
+        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center justify-between z-10">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              {editingId ? 'Edit Encounter' : 'New Encounter'}
+            </h2>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-tight">Patient Visit Details</p>
           </div>
+          <button onClick={handleCloseModal} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
+            <FiX size={24} />
+          </button>
         </div>
+
+        {/* Scrollable Form Content */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Patient Name</label>
+            <input 
+              name="patient"
+              value={formData.patient}
+              onChange={handleInputChange}
+              placeholder="Full name"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Provider</label>
+            <input 
+              name="provider"
+              value={formData.provider}
+              onChange={handleInputChange}
+              placeholder="Dr. Name"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Date</label>
+              <input 
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Charge ($)</label>
+              <input 
+                type="number"
+                name="charge"
+                value={formData.charge}
+                onChange={handleInputChange}
+                step="0.01"
+                placeholder="0.00"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-blue-600"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Chief Complaint</label>
+            <textarea 
+              name="chiefComplaint"
+              value={formData.chiefComplaint}
+              onChange={handleInputChange}
+              rows={4}
+              placeholder="Describe the reason for the visit..."
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </form>
+
+        {/* Action Buttons (Sticky Footer) */}
+        <div className="p-6 border-t border-slate-100 bg-slate-50 flex gap-3">
+          <button type="button" onClick={handleCloseModal} className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-100 transition-all">
+            Cancel
+          </button>
+          <button 
+            onClick={(e) => handleSubmit(e)} 
+            type="submit" 
+            className="flex-2 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 active:scale-95 transition-all">
+            {editingId ? 'Update Record' : 'Save Encounter'}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
       )}
     </div>
   )

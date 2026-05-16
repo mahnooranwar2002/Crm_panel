@@ -251,17 +251,26 @@ const SoftwareTable = () => {
           </table>
         </div>
       </div>
-      {/* CREATE PROJECT MODAL */}
+      {/* CREATE PROJECT SIDEBAR */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[540px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center sticky top-0 bg-white">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Create Project</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
-                <FiX size={24} />
-              </button>
-            </div>
-            <form onSubmit={handleCreateProject} className="px-10 pb-10 space-y-4">
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Create Project</h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
+              <form onSubmit={handleCreateProject} className="space-y-4">
+
               <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Name</label>
                 <input type="text" required value={newProject.projectName} onChange={(e) => setNewProject({...newProject, projectName: e.target.value})} placeholder="e.g. E-Commerce Platform" className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
@@ -305,82 +314,100 @@ const SoftwareTable = () => {
                 Create Project
               </button>
             </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* EDIT PROJECT MODAL */}
+      {/* EDIT PROJECT SIDEBAR */}
       {isEditModalOpen && editProjectData && (
-        <div className="fixed inset-0 text-black z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[540px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center sticky top-0 bg-white">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Update Project</h2>
-              <button onClick={() => setIsEditModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
-                <FiX size={24} />
-              </button>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsEditModalOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Update Project</h2>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
+              <form onSubmit={handleUpdateProject} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Name</label>
+                  <input type="text" required value={editProjectData.projectName} onChange={(e) => setEditProjectData({...editProjectData, projectName: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Lead Name</label>
+                  <input type="text" required value={editProjectData.leadName} onChange={(e) => setEditProjectData({...editProjectData, leadName: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Technology Stack</label>
+                  <input type="text" required value={editProjectData.technology} onChange={(e) => setEditProjectData({...editProjectData, technology: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Workflow Description</label>
+                  <textarea value={editProjectData.workflowDescription} onChange={(e) => setEditProjectData({...editProjectData, workflowDescription: e.target.value})} placeholder="Describe the work being done and features added..." className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-20" />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Repository URL</label>
+                  <input type="text" value={editProjectData.repositoryUrl} onChange={(e) => setEditProjectData({...editProjectData, repositoryUrl: e.target.value})} placeholder="https://github.com/..." className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
+                    <input type="date" required value={editProjectData.startDate} onChange={(e) => setEditProjectData({...editProjectData, startDate: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">End Date</label>
+                    <input type="date" required value={editProjectData.endDate} onChange={(e) => setEditProjectData({...editProjectData, endDate: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Status</label>
+                  <select value={editProjectData.projectStatus} onChange={(e) => setEditProjectData({...editProjectData, projectStatus: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm">
+                    <option value="Development">Development</option>
+                    <option value="Testing">Testing</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+                <button type="submit" className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]">
+                  Update Project
+                </button>
+              </form>
             </div>
-            <form onSubmit={handleUpdateProject} className="px-10 pb-10 space-y-4">
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Name</label>
-                <input type="text" required value={editProjectData.projectName} onChange={(e) => setEditProjectData({...editProjectData, projectName: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Lead Name</label>
-                <input type="text" required value={editProjectData.leadName} onChange={(e) => setEditProjectData({...editProjectData, leadName: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Technology Stack</label>
-                <input type="text" required value={editProjectData.technology} onChange={(e) => setEditProjectData({...editProjectData, technology: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Workflow Description</label>
-                <textarea value={editProjectData.workflowDescription} onChange={(e) => setEditProjectData({...editProjectData, workflowDescription: e.target.value})} placeholder="Describe the work being done and features added..." className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm h-20" />
-              </div>
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Repository URL</label>
-                <input type="text" value={editProjectData.repositoryUrl} onChange={(e) => setEditProjectData({...editProjectData, repositoryUrl: e.target.value})} placeholder="https://github.com/..." className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
-                  <input type="date" required value={editProjectData.startDate} onChange={(e) => setEditProjectData({...editProjectData, startDate: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">End Date</label>
-                  <input type="date" required value={editProjectData.endDate} onChange={(e) => setEditProjectData({...editProjectData, endDate: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-[#21a9ff] focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Status</label>
-                <select value={editProjectData.projectStatus} onChange={(e) => setEditProjectData({...editProjectData, projectStatus: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm">
-                  <option value="Development">Development</option>
-                  <option value="Testing">Testing</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
-              <button type="submit" className="w-full bg-[#21a9ff] hover:bg-[#6dc6fe] text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-[0.98]">
-                Update Project
-              </button>
-            </form>
           </div>
-        </div>
+        </>
       )}
 
-      {/* PROJECT DETAILS MODAL */}
+      {/* VIEW PROJECT DETAILS SIDEBAR */}
       {isDetailsModalOpen && selectedProjectDetails && (
-        <div className="fixed inset-0 text-black z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-[680px] rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-            <div className="px-10 pt-10 pb-6 flex justify-between items-center sticky top-0 bg-white border-b border-slate-100">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">{selectedProjectDetails.projectName}</h2>
-                <p className="text-sm text-slate-500 mt-1">Project Details & Progress</p>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsDetailsModalOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">{selectedProjectDetails.projectName}</h2>
+                  <p className="text-sm text-slate-500 mt-1">Project Details</p>
+                </div>
+                <button
+                  onClick={() => setIsDetailsModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
               </div>
-              <button onClick={() => setIsDetailsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-600">
-                <FiX size={24} />
-              </button>
-            </div>
-            <div className="px-10 py-8 space-y-6">
+
               {/* Lead Info */}
               <div className="flex items-start gap-4 pb-4 border-b border-slate-100">
                 <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
@@ -393,7 +420,7 @@ const SoftwareTable = () => {
               </div>
 
               {/* Technology & Timeline */}
-              <div className="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100">
+              <div className="space-y-4 pb-4 border-b border-slate-100">
                 <div>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Technology</p>
                   <p className="text-sm font-bold text-slate-700 mt-1">{selectedProjectDetails.technology}</p>
@@ -467,7 +494,7 @@ const SoftwareTable = () => {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       <Toaster position="top-right" reverseOrder={false} />

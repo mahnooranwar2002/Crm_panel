@@ -161,96 +161,120 @@ const SocialIntegrationTable = () => {
       </div>
 
       {/* //////////////////////// */}
-      {/* VIEW DETAILS MODAL */}
+      {/* VIEW DETAILS SIDEBAR */}
       {viewingSocialIntegration && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setViewingSocialIntegration(null)} />
-          <div className="relative bg-white/90 backdrop-blur-2xl rounded-[3rem] shadow-2xl w-full max-w-lg border border-white/20 overflow-hidden transform transition-all animate-in zoom-in duration-300">
-            <div className="p-10">
-              <div className="flex justify-between items-start mb-8">
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingSocialIntegration.status)}`}>
-                  {viewingSocialIntegration.status}
-                </span>
-                <button onClick={() => setViewingSocialIntegration(null)} className="p-3 bg-slate-100 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewingSocialIntegration(null)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">{viewingSocialIntegration.account_name}</h2>
+                <button
+                  onClick={() => setViewingSocialIntegration(null)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                  type="button"
+                >
                   <FiX size={24} />
                 </button>
               </div>
 
-              <h2 className="text-4xl font-black text-slate-900 mb-2">{viewingSocialIntegration.account_name}</h2>
-              <p className="text-slate-500 font-medium mb-8">Connected by {viewingSocialIntegration.connected_by}</p>
+              <div className="space-y-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${getStatusColor(viewingSocialIntegration.status)}`}
+                >
+                  {viewingSocialIntegration.status}
+                </span>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Platform</p>
-                  <p className="text-lg font-black text-blue-600">{viewingSocialIntegration.platform}</p>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Connected By</p>
+                  <p className="font-bold text-slate-700">{viewingSocialIntegration.connected_by}</p>
                 </div>
-                <div className="bg-white/50 p-6 rounded-[2rem] border border-white shadow-sm flex flex-col justify-center">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Followers</p>
-                  <p className="text-lg font-black text-slate-700">{viewingSocialIntegration.followers_count.toLocaleString()}</p>
-                </div>
-              </div>
 
-              <div className="space-y-4 px-2 border-t border-slate-100 pt-6">
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Engagement Rate</div>
-                  <div className="font-black text-green-600">{viewingSocialIntegration.engagement_rate.toFixed(1)}%</div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Platform</p>
+                  <p className="font-bold text-blue-600 text-lg">{viewingSocialIntegration.platform}</p>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Posts Count</div>
-                  <div className="font-black text-slate-700">{viewingSocialIntegration.posts_count}</div>
+
+                <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Followers</p>
+                    <p className="font-bold text-slate-700">{viewingSocialIntegration.followers_count.toLocaleString()}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Engagement Rate</p>
+                    <p className="font-bold text-green-600">{viewingSocialIntegration.engagement_rate.toFixed(1)}%</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Avg Likes/Post</div>
-                  <div className="font-black text-blue-600">{viewingSocialIntegration.avg_likes_per_post}</div>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Avg Comments/Post</div>
-                  <div className="font-black text-slate-700">{viewingSocialIntegration.avg_comments_per_post}</div>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Avg Shares/Post</div>
-                  <div className="font-black text-slate-700">{viewingSocialIntegration.avg_shares_per_post}</div>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Connected Date</div>
-                  <div className="font-black text-slate-700">{new Date(viewingSocialIntegration.connected_date).toLocaleDateString()}</div>
-                </div>
-                {viewingSocialIntegration.auto_posting_enabled && (
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Posts Count</span>
+                    <span className="font-black text-slate-700">{viewingSocialIntegration.posts_count}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Avg Likes/Post</span>
+                    <span className="font-black text-blue-600">{viewingSocialIntegration.avg_likes_per_post}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Avg Comments/Post</span>
+                    <span className="font-black text-slate-700">{viewingSocialIntegration.avg_comments_per_post}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Avg Shares/Post</span>
+                    <span className="font-black text-slate-700">{viewingSocialIntegration.avg_shares_per_post}</span>
+                  </div>
                   <div className="flex justify-between items-center py-2">
-                    <div className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Auto-Posting</div>
-                    <div className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-black">Enabled</div>
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Connected Date</span>
+                    <span className="font-black text-slate-700">{new Date(viewingSocialIntegration.connected_date).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                {viewingSocialIntegration.auto_posting_enabled && (
+                  <div className="flex justify-between items-center py-2 border-t border-slate-100">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Auto-Posting</span>
+                    <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-black">Enabled</span>
                   </div>
                 )}
+
                 {viewingSocialIntegration.notes && (
-                  <div className="mt-4 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">"{viewingSocialIntegration.notes}"</div>
+                  <div className="mt-2 bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600 border border-slate-100">
+                    "{viewingSocialIntegration.notes}"
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
       {/* //////////////////////// */}
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-hidden">
+        <>
           <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 z-[9998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setShowModal(false)}
           />
 
           <form
             onSubmit={handleSubmit}
-            className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden border border-white/20"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[9999] animate-in slide-in-from-right duration-300 overflow-y-auto"
           >
-            <div className="p-8 pb-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold">{isEditing ? 'Edit' : 'Connect'} Social Account</h2>
-              <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
+            <div className="p-8 pb-4 flex justify-between items-center border-b border-slate-100">
+              <h2 className="text-2xl font-black text-slate-800">{isEditing ? 'Edit' : 'Connect'} Social Account</h2>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+              >
                 <FiX size={20} />
               </button>
             </div>
 
-            <div className="px-8 pb-8 overflow-y-auto max-h-[60vh] space-y-4">
+            <div className="px-8 pb-8 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-slate-700">Platform</label>
@@ -384,7 +408,7 @@ const SocialIntegrationTable = () => {
               </div>
             </div>
 
-            <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+            <div className="p-8 pt-4 bg-slate-50 border-t border-slate-100 flex gap-3 sticky bottom-0">
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
@@ -402,7 +426,7 @@ const SocialIntegrationTable = () => {
               </button>
             </div>
           </form>
-        </div>
+        </>
       )}
     </div>
   )

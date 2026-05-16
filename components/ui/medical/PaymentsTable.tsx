@@ -168,7 +168,7 @@ export function PaymentsTable() {
 
       {/* 1. VIEW PAYMENT MODAL - Matching Claims Design */}
       {viewCardOpen && currentPayment && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-999 flex justify-end">
           {/* Solid background overlay instead of blur to prevent navbar bleeding */}
           <div className="absolute inset-0 bg-slate-900/60" onClick={() => setViewCardOpen(false)} />
           
@@ -226,119 +226,125 @@ export function PaymentsTable() {
 
       {/* 2. EDIT/RECORD PAYMENT MODAL - Clean & Solid UI */}
       {showModal && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-          {/* Solid dark overlay to hide background noise */}
-          <div className="absolute inset-0 bg-slate-900/60" onClick={handleCloseModal} />
-          
-          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col animate-in fade-in zoom-in-95 duration-200">
-            
-            {/* Header */}
-            <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0">
-              <h2 className="text-xl font-bold text-slate-900">
-                {editingId ? 'Edit Payment Record' : 'Record New Payment'}
-              </h2>
-              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600 p-1">
-                <FiX size={22} />
-              </button>
+  <div className="fixed inset-0 z-1000 flex justify-end">
+    {/* Overlay: clickable to close */}
+    <div 
+      className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+      onClick={handleCloseModal} 
+    />
+    
+    {/* Sidebar Content: Changed to h-full, max-w-md, and added slide-in animation */}
+    <div className="relative bg-white w-full max-w-md h-full shadow-2xl border-l border-slate-200 flex flex-col animate-in slide-in-from-right duration-300">
+      
+      {/* Header: Sticky at the top */}
+      <div className="px-6 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
+        <h2 className="text-xl font-bold text-slate-900">
+          {editingId ? 'Edit Payment Record' : 'Record New Payment'}
+        </h2>
+        <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-50 rounded-full transition-colors">
+          <FiX size={22} />
+        </button>
+      </div>
+
+      {/* Form: Scrollable area with flex-1 */}
+      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Claim ID</label>
+            <input 
+              name="claimId"
+              value={formData.claimId}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              placeholder="e.g. CLM-101"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Patient Name</label>
+            <input 
+              name="patient"
+              value={formData.patient}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Amount ($)</label>
+              <input 
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleInputChange}
+                step="0.01"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-semibold focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Date Posted</label>
+              <input 
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-8 space-y-5 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Claim ID</label>
-                  <input 
-                    name="claimId"
-                    value={formData.claimId}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="e.g. CLM-101"
-                    required
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Patient Name</label>
-                  <input 
-                    name="patient"
-                    value={formData.patient}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    required
-                  />
-                </div>
-              </div>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Payment Type</label>
+            <select 
+              name="type"
+              value={formData.type}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none cursor-pointer focus:ring-2 focus:ring-blue-500">
+              <option>Insurance Check</option>
+              <option>Patient Copay</option>
+              <option>Deductible</option>
+              <option>Contractual Adjustment</option>
+            </select>
+          </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Amount ($)</label>
-                  <input 
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none font-semibold"
-                    required
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Payment Type</label>
-                  <select 
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
-                    <option>Insurance Check</option>
-                    <option>Patient Copay</option>
-                    <option>Deductible</option>
-                    <option>Contractual Adjustment</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Date Posted</label>
-                <input 
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Notes</label>
-                <textarea 
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  rows={2}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none transition-all"
-                  placeholder="Optional notes..."
-                />
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button type="submit" className="flex-1 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-all">
-                  {editingId ? 'Update Record' : 'Record Payment'}
-                </button>
-                <button type="button" onClick={handleCloseModal} className="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition-all">
-                  Cancel
-                </button>
-              </div>
-            </form>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Notes</label>
+            <textarea 
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              rows={4}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all focus:ring-2 focus:ring-blue-500"
+              placeholder="Optional notes..."
+            />
           </div>
         </div>
-      )}
-      </div>
-    )}
+      </form>
 
+      {/* Footer: Action Buttons fixed at the bottom */}
+      <div className="p-6 border-t border-slate-100 bg-slate-50 flex gap-3">
+        <button type="submit" className="flex-1 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200">
+          {editingId ? 'Update Record' : 'Record Payment'}
+        </button>
+        <button type="button" onClick={handleCloseModal} className="px-6 bg-white text-slate-600 border border-slate-200 py-4 rounded-xl font-bold hover:bg-slate-50 transition-all">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+      )}
+    </div>
+  )
+}
 
 // 2. ERA Parser Component
 export function ERAParser() {
-  const [file, setFile] = useState<File | null>(null)
+  const [file, setFile] = useState<any | null>(null)
   const [parsing, setParsing] = useState(false)
 
   return (

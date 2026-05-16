@@ -249,11 +249,13 @@ export const LeadsTable = () => {
         </table>
       </div>
 
-      {/* Add/Edit Modal */}
+      {/* Add/Edit Sidebar */}
       {(addingLead || editingLead) && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-center mb-6">
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => { setAddingLead(null); setEditingLead(null); }} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
               <h2 className="text-2xl font-black text-slate-800">
                 {addingLead ? "Add New Lead" : "Edit Lead"}
               </h2>
@@ -269,36 +271,35 @@ export const LeadsTable = () => {
             </div>
 
             <form onSubmit={addingLead ? handleAddLead : handleEditLead} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={addingLead?.firstName || editingLead?.firstName || ""}
-                    onChange={(e) => {
-                      if (addingLead) setAddingLead({ ...addingLead, firstName: e.target.value });
-                      if (editingLead) setEditingLead({ ...editingLead, firstName: e.target.value });
-                    }}
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={addingLead?.lastName || editingLead?.lastName || ""}
-                    onChange={(e) => {
-                      if (addingLead) setAddingLead({ ...addingLead, lastName: e.target.value });
-                      if (editingLead) setEditingLead({ ...editingLead, lastName: e.target.value });
-                    }}
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={addingLead?.firstName || editingLead?.firstName || ""}
+                  onChange={(e) => {
+                    if (addingLead) setAddingLead({ ...addingLead, firstName: e.target.value });
+                    if (editingLead) setEditingLead({ ...editingLead, firstName: e.target.value });
+                  }}
+                  className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={addingLead?.lastName || editingLead?.lastName || ""}
+                  onChange={(e) => {
+                    if (addingLead) setAddingLead({ ...addingLead, lastName: e.target.value });
+                    if (editingLead) setEditingLead({ ...editingLead, lastName: e.target.value });
+                  }}
+                  className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
+                />
               </div>
 
               <div className="space-y-1">
@@ -317,40 +318,39 @@ export const LeadsTable = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    value={addingLead?.company || editingLead?.company || ""}
-                    onChange={(e) => {
-                      if (addingLead) setAddingLead({ ...addingLead, company: e.target.value });
-                      if (editingLead) setEditingLead({ ...editingLead, company: e.target.value });
-                    }}
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-                    Source
-                  </label>
-                  <select
-                    value={addingLead?.source || editingLead?.source || "Ads"}
-                    onChange={(e) => {
-                      if (addingLead) setAddingLead({ ...addingLead, source: e.target.value });
-                      if (editingLead) setEditingLead({ ...editingLead, source: e.target.value });
-                    }}
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
-                  >
-                    {SOURCE_OPTIONS.map((source) => (
-                      <option key={source} value={source}>
-                        {source}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="space-y-1">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  Company
+                </label>
+                <input
+                  type="text"
+                  value={addingLead?.company || editingLead?.company || ""}
+                  onChange={(e) => {
+                    if (addingLead) setAddingLead({ ...addingLead, company: e.target.value });
+                    if (editingLead) setEditingLead({ ...editingLead, company: e.target.value });
+                  }}
+                  className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                  Source
+                </label>
+                <select
+                  value={addingLead?.source || editingLead?.source || "Ads"}
+                  onChange={(e) => {
+                    if (addingLead) setAddingLead({ ...addingLead, source: e.target.value });
+                    if (editingLead) setEditingLead({ ...editingLead, source: e.target.value });
+                  }}
+                  className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
+                >
+                  {SOURCE_OPTIONS.map((source) => (
+                    <option key={source} value={source}>
+                      {source}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-1">
@@ -380,15 +380,18 @@ export const LeadsTable = () => {
                 {addingLead ? "Create Lead" : "Update Lead"}
               </button>
             </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* View Modal */}
+      {/* View Sidebar */}
       {selectedLead && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-300">
-            <div className="flex justify-between items-center mb-6">
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setSelectedLead(null)} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
               <h2 className="text-2xl font-black text-slate-800">Lead Details</h2>
               <button
                 onClick={() => setSelectedLead(null)}
@@ -399,22 +402,21 @@ export const LeadsTable = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-50 rounded-xl">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
-                    First Name
-                  </p>
-                  <p className="font-bold text-slate-800">{selectedLead.firstName}</p>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-xl">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
-                    Last Name
-                  </p>
-                  <p className="font-bold text-slate-800">{selectedLead.lastName || "N/A"}</p>
-                </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
+                  First Name
+                </p>
+                <p className="font-bold text-slate-800">{selectedLead.firstName}</p>
               </div>
 
-              <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
+                  Last Name
+                </p>
+                <p className="font-bold text-slate-800">{selectedLead.lastName || "N/A"}</p>
+              </div>
+
+              <div className="space-y-1">
                 <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
                   Email
                 </p>
@@ -423,22 +425,21 @@ export const LeadsTable = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-50 rounded-xl">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
-                    Company
-                  </p>
-                  <p className="font-bold text-slate-800">{selectedLead.company}</p>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-xl">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
-                    Source
-                  </p>
-                  <p className="font-bold text-slate-800">{selectedLead.source}</p>
-                </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
+                  Company
+                </p>
+                <p className="font-bold text-slate-800">{selectedLead.company}</p>
               </div>
 
-              <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
+                  Source
+                </p>
+                <p className="font-bold text-slate-800">{selectedLead.source}</p>
+              </div>
+
+              <div className="space-y-1">
                 <p className="text-[10px] font-black text-slate-400 uppercase mb-2">
                   Status
                 </p>
@@ -452,7 +453,7 @@ export const LeadsTable = () => {
               </div>
 
               {selectedLead.createdAt && (
-                <div className="p-4 bg-slate-50 rounded-xl">
+                <div className="space-y-1">
                   <p className="text-[10px] font-black text-slate-400 uppercase mb-1">
                     Created
                   </p>
@@ -469,8 +470,9 @@ export const LeadsTable = () => {
                 Close
               </button>
             </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
       <Toaster position="top-right" reverseOrder={false} />
     </div>

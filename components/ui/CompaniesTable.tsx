@@ -281,190 +281,275 @@ const CompaniesTable = () => {
         )}
       </div>
 
-      {/* --- View Modal --- */}
+      {/* --- View Sidebar --- */}
       {selectedCompany && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 border border-white/20 my-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black text-slate-900">Company Details</h2>
-              <button onClick={() => setSelectedCompany(null)} className="p-3 hover:bg-slate-100 rounded-full transition-all">
-                <FiX size={24} />
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Company Name</p>
-                <p className="text-2xl font-black text-slate-900">{selectedCompany.name}</p>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setSelectedCompany(null)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">
+                  Company Details
+                </h2>
+                <button
+                  onClick={() => setSelectedCompany(null)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Industry</p>
-                  <p className="text-lg font-bold text-slate-700">{selectedCompany.industry}</p>
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                    Company Name
+                  </p>
+                  <p className="text-xl font-black text-slate-900">
+                    {selectedCompany.name}
+                  </p>
                 </div>
 
-                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Owner</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[#6dc6fe]/20 flex items-center justify-center text-[#21a9ff] font-bold text-xs">
-                      {(selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}` || '?').charAt(0)}
-                    </div>
-                    <p className="font-bold text-slate-700">
-                      {selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}`.trim() || selectedCompany.owner_id?.email || 'Unassigned'}
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                      Industry
+                    </p>
+                    <p className="text-lg font-bold text-slate-700">
+                      {selectedCompany.industry}
                     </p>
                   </div>
+
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                      Owner
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#6dc6fe]/20 flex items-center justify-center text-[#21a9ff] font-bold text-xs uppercase">
+                        {(selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}` || '?').charAt(0)}
+                      </div>
+                      <p className="font-bold text-slate-700">
+                        {selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}`.trim() || selectedCompany.owner_id?.email || 'Unassigned'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
-                  <FiGlobe /> Website
-                </p>
-                <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-[#21a9ff] hover:underline">
-                  {selectedCompany.website || 'No website'}
-                </a>
-              </div>
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                    <FiGlobe /> Website
+                  </p>
+                  <a
+                    href={selectedCompany.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-slate-900 font-bold hover:underline"
+                  >
+                    {selectedCompany.website || 'No website'}
+                  </a>
+                </div>
 
-              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
-                  <FiMapPin /> Address
-                </p>
-                <p className="text-lg font-bold text-slate-700">{selectedCompany.address || 'No address provided'}</p>
-              </div>
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                    <FiMapPin /> Address
+                  </p>
+                  <p className="text-lg font-bold text-slate-700">
+                    {selectedCompany.address || 'No address provided'}
+                  </p>
+                </div>
 
-              <button 
-                onClick={() => setSelectedCompany(null)}
-                className="w-full py-5 text-white rounded-[1.5rem] font-black shadow-2xl hover:brightness-110 active:scale-[0.98] transition-all mt-4 text-lg uppercase tracking-widest"
-                style={{ backgroundColor: PRIMARY_COLOR }}
-              >
-                Close
-              </button>
+                <button
+                  onClick={() => setSelectedCompany(null)}
+                  className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* --- Add/Edit Modal --- */}
+      {/* --- Add/Edit Sidebar --- */}
       {(addingCompany || editingCompany) && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 border border-white/20 my-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-black text-slate-900">{addingCompany ? 'New Company' : 'Edit Company'}</h2>
-              <button onClick={() => { setAddingCompany(null); setEditingCompany(null); }} className="p-3 hover:bg-slate-100 rounded-full transition-all">
-                <FiX size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => {
+              setAddingCompany(null);
+              setEditingCompany(null);
+            }}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">
+                  {addingCompany ? 'New Company' : 'Edit Company'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setAddingCompany(null);
+                    setEditingCompany(null);
+                  }}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Company Name</label>
-                  <input 
-                    className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold"
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
                     value={addingCompany?.name || editingCompany?.name || ''}
-                    onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, name: e.target.value}) : setEditingCompany({...editingCompany!, name: e.target.value})}
+                    onChange={(e) =>
+                      addingCompany
+                        ? setAddingCompany({ ...addingCompany, name: e.target.value })
+                        : setEditingCompany({ ...editingCompany!, name: e.target.value })
+                    }
                     placeholder="e.g. Google"
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Industry</label>
-                  <input 
-                    className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold"
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Industry
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
                     value={addingCompany?.industry || editingCompany?.industry || ''}
-                    onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, industry: e.target.value}) : setEditingCompany({...editingCompany!, industry: e.target.value})}
+                    onChange={(e) =>
+                      addingCompany
+                        ? setAddingCompany({ ...addingCompany, industry: e.target.value })
+                        : setEditingCompany({ ...editingCompany!, industry: e.target.value })
+                    }
                     placeholder="e.g. Tech"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Website URL</label>
-                <div className="relative">
-                  <FiGlobe className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input 
-                    className="w-full pl-12 pr-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold"
-                    value={addingCompany?.website || editingCompany?.website || ''}
-                    onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, website: e.target.value}) : setEditingCompany({...editingCompany!, website: e.target.value})}
-                    placeholder="www.aura.com"
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Website URL
+                  </label>
+                  <div className="relative">
+                    <FiGlobe className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      className="w-full pl-12 pr-6 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
+                      value={addingCompany?.website || editingCompany?.website || ''}
+                      onChange={(e) =>
+                        addingCompany
+                          ? setAddingCompany({ ...addingCompany, website: e.target.value })
+                          : setEditingCompany({ ...editingCompany!, website: e.target.value })
+                      }
+                      placeholder="www.aura.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Assign to Owner
+                  </label>
+                  <select
+                    className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none appearance-none font-bold"
+                    value={addingCompany?.owner_id?._id || editingCompany?.owner_id?._id || ''}
+                    onChange={(e) => {
+                      const selectedUser = users.find((u) => u._id === e.target.value);
+                      if (addingCompany) {
+                        setAddingCompany({ ...addingCompany, owner_id: selectedUser || null });
+                      } else {
+                        setEditingCompany({ ...editingCompany!, owner_id: selectedUser || null });
+                      }
+                    }}
+                  >
+                    <option value="">Select an owner</option>
+                    {Array.isArray(users) && users.length > 0 ? (
+                      users.map((u) => (
+                        <option key={u._id} value={u._id}>
+                          {u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || 'Unknown'}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No users available</option>
+                    )}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Address
+                  </label>
+                  <textarea
+                    className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold resize-none"
+                    rows={2}
+                    value={addingCompany?.address || editingCompany?.address || ''}
+                    onChange={(e) =>
+                      addingCompany
+                        ? setAddingCompany({ ...addingCompany, address: e.target.value })
+                        : setEditingCompany({ ...editingCompany!, address: e.target.value })
+                    }
+                    placeholder="Street, City, Country"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Assign to Owner</label>
-                <select 
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold appearance-none"
-                  value={addingCompany?.owner_id?._id || editingCompany?.owner_id?._id || ''}
-                  onChange={(e) => {
-                    const selectedUser = users.find(u => u._id === e.target.value);
-                    if (addingCompany) {
-                      setAddingCompany({...addingCompany, owner_id: selectedUser || null});
-                    } else {
-                      setEditingCompany({...editingCompany!, owner_id: selectedUser || null});
-                    }
-                  }}
+                <button
+                  onClick={
+                    addingCompany
+                      ? async () => {
+                          if (!addingCompany.name || !addingCompany.industry) {
+                            toast.error('Please fill in all required fields');
+                            return;
+                          }
+                          const loadToast = toast.loading('Creating...');
+                          try {
+                            await CompanyService.createCompany({
+                              ...addingCompany,
+                              owner_id: addingCompany.owner_id?._id,
+                            });
+                            toast.success('Success!', { id: loadToast });
+                            setAddingCompany(null);
+                            setSearchTerm('');
+                            await fetchCompanies('');
+                          } catch (e: any) {
+                            toast.error(e.message, { id: loadToast });
+                          }
+                        }
+                      : async () => {
+                          if (!editingCompany?.name || !editingCompany?.industry) {
+                            toast.error('Please fill in all required fields');
+                            return;
+                          }
+                          const loadToast = toast.loading('Updating...');
+                          try {
+                            await CompanyService.updateCompany(editingCompany!._id!, {
+                              ...editingCompany,
+                              owner_id: editingCompany?.owner_id?._id,
+                            });
+                            toast.success('Updated!', { id: loadToast });
+                            setEditingCompany(null);
+                            setSearchTerm('');
+                            await fetchCompanies('');
+                          } catch (e: any) {
+                            toast.error(e.message, { id: loadToast });
+                          }
+                        }
+                  }
+                  className="w-full py-4 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white rounded-2xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95"
                 >
-                  <option value="">Select an owner</option>
-                  {Array.isArray(users) && users.length > 0 ? (
-                    users.map(u => (
-                      <option key={u._id} value={u._id}>
-                        {u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || 'Unknown'}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>No users available</option>
-                  )}
-                </select>
+                  Save Company Info
+                </button>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-2">Address</label>
-                <textarea 
-                  className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-[#21a9ff] focus:bg-white focus:outline-none transition-all font-bold resize-none"
-                  rows={2}
-                  value={addingCompany?.address || editingCompany?.address || ''}
-                  onChange={(e) => addingCompany ? setAddingCompany({...addingCompany, address: e.target.value}) : setEditingCompany({...editingCompany!, address: e.target.value})}
-                  placeholder="Street, City, Country"
-                />
-              </div>
-
-              <button 
-                onClick={addingCompany ? async () => {
-                  if (!addingCompany.name || !addingCompany.industry) {
-                    toast.error("Please fill in all required fields");
-                    return;
-                  }
-                  const loadToast = toast.loading("Creating...");
-                  try {
-                    await CompanyService.createCompany({...addingCompany, owner_id: addingCompany.owner_id?._id});
-                    toast.success("Success!", { id: loadToast });
-                    setAddingCompany(null);
-                    setSearchTerm('');
-                    await fetchCompanies('');
-                  } catch (e:any) { toast.error(e.message, {id: loadToast}); }
-                } : async () => {
-                  if (!editingCompany?.name || !editingCompany?.industry) {
-                    toast.error("Please fill in all required fields");
-                    return;
-                  }
-                  const loadToast = toast.loading("Updating...");
-                  try {
-                    await CompanyService.updateCompany(editingCompany!._id!, {...editingCompany, owner_id: editingCompany?.owner_id?._id});
-                    toast.success("Updated!", { id: loadToast });
-                    setEditingCompany(null);
-                    setSearchTerm('');
-                    await fetchCompanies('');
-                  } catch (e:any) { toast.error(e.message, {id: loadToast}); }
-                }}
-                className="w-full py-5 text-white rounded-[1.5rem] font-black shadow-2xl hover:brightness-110 active:scale-[0.98] transition-all mt-4 text-lg uppercase tracking-widest"
-                style={{ backgroundColor: PRIMARY_COLOR }}
-              >
-                Save Company Info
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

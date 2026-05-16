@@ -223,118 +223,219 @@ export const OpportunitiesTable = () => {
         </div>
       </div>
 
-      {/* CREATE/EDIT MODAL */}
+      {/* CREATE/EDIT SIDEBAR */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center text-black justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] p-10 relative">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-black text-slate-800 uppercase">{modalMode} Opportunity</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400"><FiX size={24} /></button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5">
-              <div className="col-span-2 space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Title</label>
-                <input required className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.title} onChange={e => setCurrentOpp({...currentOpp, title: e.target.value})} />
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800 uppercase">
+                  {modalMode} Opportunity
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Contact *</label>
-                <select required className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.contactId || ''} onChange={e => {
-                    console.log("🔗 Contact selected:", e.target.value);
-                    setCurrentOpp({...currentOpp, contactId: e.target.value});
-                  }}>
-                  <option value="">-- Select a Contact --</option>
-                  {contacts && contacts.length > 0 ? (
-                    contacts.map(c => <option key={c._id} value={c._id}>{c.first_name} {c.last_name}</option>)
-                  ) : (
-                    <option disabled>No contacts available</option>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Title
+                  </label>
+                  <input
+                    required
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.title}
+                    onChange={(e) => setCurrentOpp({ ...currentOpp, title: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Contact *
+                  </label>
+                  <select
+                    required
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.contactId || ''}
+                    onChange={(e) => {
+                      setCurrentOpp({ ...currentOpp, contactId: e.target.value });
+                    }}
+                  >
+                    <option value="">-- Select a Contact --</option>
+                    {contacts && contacts.length > 0 ? (
+                      contacts.map((c) => (
+                        <option key={c._id} value={c._id}>
+                          {c.first_name} {c.last_name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No contacts available</option>
+                    )}
+                  </select>
+                  {contacts.length === 0 && (
+                    <p className="text-[10px] text-amber-600 mt-2">
+                      ⚠️ No contacts loaded
+                    </p>
                   )}
-                </select>
-                {contacts.length === 0 && <p className="text-[10px] text-amber-600 mt-1">⚠️ No contacts loaded</p>}
-              </div>
+                </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Owner</label>
-                <select required className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.owner_id} onChange={e => setCurrentOpp({...currentOpp, owner_id: e.target.value})}>
-                  <option value="">Select Owner</option>
-                  {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
-                </select>
-              </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Owner
+                  </label>
+                  <select
+                    required
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.owner_id}
+                    onChange={(e) => setCurrentOpp({ ...currentOpp, owner_id: e.target.value })}
+                  >
+                    <option value="">Select Owner</option>
+                    {users.map((u) => (
+                      <option key={u._id} value={u._id}>
+                        {u.name || u.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Amount ($)</label>
-                <input type="number" className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.amount} onChange={e => setCurrentOpp({...currentOpp, amount: Number(e.target.value)})} />
-              </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Amount ($)
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.amount}
+                    onChange={(e) => setCurrentOpp({ ...currentOpp, amount: Number(e.target.value) })}
+                  />
+                </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Probability (%)</label>
-                <input type="number" min="0" max="100" className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.probability} onChange={e => setCurrentOpp({...currentOpp, probability: Number(e.target.value)})} />
-              </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Probability (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.probability}
+                    onChange={(e) => setCurrentOpp({ ...currentOpp, probability: Number(e.target.value) })}
+                  />
+                </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Close Date</label>
-                <input type="date" className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.close_date} onChange={e => setCurrentOpp({...currentOpp, close_date: e.target.value})} />
-              </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Close Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.close_date}
+                    onChange={(e) => setCurrentOpp({ ...currentOpp, close_date: e.target.value })}
+                  />
+                </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase">Stage</label>
-                <select className="w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-bold"
-                  value={currentOpp.stage} onChange={e => setCurrentOpp({...currentOpp, stage: e.target.value})}>
-                  {STAGES.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
-                </select>
-              </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                    Stage
+                  </label>
+                  <select
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    value={currentOpp.stage}
+                    onChange={(e) => setCurrentOpp({ ...currentOpp, stage: e.target.value })}
+                  >
+                    {STAGES.map((s) => (
+                      <option key={s} value={s}>
+                        {s.replace('_', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <button type="submit" className="col-span-2 mt-4 py-4 text-white rounded-2xl font-black uppercase bg-[#21a9ff] shadow-xl">
-                Save Opportunity
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white rounded-2xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95"
+                >
+                  Save Opportunity
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* VIEW CARD */}
+      {/* VIEW SIDEBAR */}
       {viewCardOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-          <div className="bg-white w-full max-w-xl rounded-[2.5rem] p-10 relative">
-            <button onClick={() => setViewCardOpen(false)} className="absolute top-6 right-6 text-slate-400"><FiX size={24} /></button>
-            <h3 className="text-xl font-black text-slate-800 uppercase mb-8 flex items-center gap-2">
-              <FiEye className="text-blue-500" /> Deal Overview
-            </h3>
-            <div className="grid grid-cols-2 gap-8">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-400 uppercase">Title</p>
-                <p className="font-bold text-slate-700 text-lg">{currentOpp.title}</p>
+        <>
+          <div
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setViewCardOpen(false)}
+          />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800 uppercase flex items-center gap-2">
+                  <FiEye className="text-blue-500" /> Deal Overview
+                </h2>
+                <button
+                  onClick={() => setViewCardOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                >
+                  <FiX size={24} />
+                </button>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-400 uppercase">Value</p>
-                <p className="font-black text-emerald-600 text-lg">${Number(currentOpp.amount).toLocaleString()}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-400 uppercase">Contact</p>
-                <p className="font-bold text-slate-700">{currentOpp.companyName}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-400 uppercase">Assigned To</p>
-                <p className="font-bold text-slate-700">{currentOpp.assignedUserName}</p>
-              </div>
-              <div className="col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
-                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase ring-1 ${STAGE_COLORS[currentOpp.stage]}`}>
-                  {currentOpp.stage?.replace('_', ' ')}
-                </span>
-                <p className="text-sm font-bold text-slate-500 flex items-center gap-2">
-                  <FiCalendar /> Closing: {currentOpp.close_date}
-                </p>
+
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase">Title</p>
+                  <p className="font-bold text-slate-700 text-lg">{currentOpp.title}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase">Value</p>
+                  <p className="font-black text-emerald-600 text-lg">${Number(currentOpp.amount).toLocaleString()}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase">Contact</p>
+                  <p className="font-bold text-slate-700">{currentOpp.companyName}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase">Assigned To</p>
+                  <p className="font-bold text-slate-700">{currentOpp.assignedUserName}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center gap-3">
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase ring-1 ${STAGE_COLORS[currentOpp.stage]}`}
+                  >
+                    {currentOpp.stage?.replace('_', ' ')}
+                  </span>
+                  <p className="text-sm font-bold text-slate-500 flex items-center gap-2">
+                    <FiCalendar /> Closing: {currentOpp.close_date}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setViewCardOpen(false)}
+                  className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

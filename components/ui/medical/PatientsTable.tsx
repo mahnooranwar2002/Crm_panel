@@ -100,14 +100,14 @@ export function PatientsTable() {
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Patient Management</h1>
             <p className="text-slate-500 font-medium mt-1">
               Centralized directory for clinical records and patient statuses.
-              <span className="ml-2 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-bold">
+              <span className="ml-2 text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full text-xs font-bold">
                 {filteredPatients.length} Records
               </span>
             </p>
           </div>
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 active:scale-95"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 active:scale-95"
           >
             <FiPlus size={20} />
             Register Patient
@@ -117,11 +117,11 @@ export function PatientsTable() {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative group">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
             <input
               type="text"
               placeholder="Search by name, MRN, or phone number..."
-              className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all shadow-sm font-medium"
+              className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none transition-all shadow-sm font-medium"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
             />
@@ -149,7 +149,7 @@ export function PatientsTable() {
                   <tr>
                     <td colSpan={5} className="px-8 py-24 text-center">
                       <div className="flex flex-col items-center">
-                        <div className="animate-spin w-10 h-10 border-[3px] border-blue-100 border-t-blue-600 rounded-full mb-4"></div>
+                        <div className="animate-spin w-10 h-10 border-[3px] border-indigo-100 border-t-indigo-600 rounded-full mb-4"></div>
                         <p className="text-slate-400 font-bold tracking-tight">Synchronizing data...</p>
                       </div>
                     </td>
@@ -166,7 +166,7 @@ export function PatientsTable() {
                   </tr>
                 ) : (
                   filteredPatients.map((patient) => (
-                    <tr key={patient.id} className="hover:bg-blue-50/40 transition-colors group cursor-default">
+                    <tr key={patient.id} className="hover:bg-indigo-50/40 transition-colors group cursor-default">
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center font-bold text-slate-600 border border-white shadow-sm">
@@ -179,7 +179,7 @@ export function PatientsTable() {
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
+                        <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
                           {patient.mrn}
                         </span>
                       </td>
@@ -204,10 +204,10 @@ export function PatientsTable() {
                       </td>
                       <td className="px-8 py-5 text-right">
                         <div className="flex justify-end items-center gap-2">
-                          <button onClick={() => setViewingPatient(patient)} className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
+                          <button onClick={() => setViewingPatient(patient)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
                             <FiUser size={18} />
                           </button>
-                          <button onClick={() => setEditingPatient(patient)} className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
+                          <button onClick={() => setEditingPatient(patient)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
                             <FiEdit2 size={18} />
                           </button>
                           <button onClick={() => handleDeletePatient(patient.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm">
@@ -224,50 +224,46 @@ export function PatientsTable() {
         </div>
       </div>
 
-      {/* --- MODALS SECTION[cite: 1] --- */}
-      {showCreateModal && (
-        <ModalWrapper title="Register New Patient" onClose={() => setShowCreateModal(false)}>
-          <PatientForm onSubmit={handleCreatePatient} onClose={() => setShowCreateModal(false)} />
-        </ModalWrapper>
-      )}
-
+      {/* --- VIEW PATIENT SIDEBAR --- */}
       {viewingPatient && (
-        <ModalWrapper title="Patient Case File" onClose={() => setViewingPatient(null)}>
-          <PatientView patient={viewingPatient} onEdit={() => { setEditingPatient(viewingPatient); setViewingPatient(null); }} />
-        </ModalWrapper>
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setViewingPatient(null)} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">Patient Details</h2>
+                <button onClick={() => setViewingPatient(null)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
+                  <FiX size={24} />
+                </button>
+              </div>
+              <PatientView patient={viewingPatient} onEdit={() => { setEditingPatient(viewingPatient); setViewingPatient(null); }} />
+            </div>
+          </div>
+        </>
       )}
 
-      {editingPatient && (
-        <ModalWrapper title="Modify Patient Records" onClose={() => setEditingPatient(null)}>
-          <PatientForm patient={editingPatient} isEdit onSubmit={handleEditPatient} onClose={() => setEditingPatient(null)} />
-        </ModalWrapper>
+      {/* --- EDIT/CREATE PATIENT SIDEBAR --- */}
+      {(showCreateModal || editingPatient) && (
+        <>
+          <div className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => { setShowCreateModal(false); setEditingPatient(null); }} />
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+            <div className="p-8 space-y-6">
+              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h2 className="text-2xl font-black text-slate-800">{editingPatient ? 'Edit Patient' : 'Register Patient'}</h2>
+                <button onClick={() => { setShowCreateModal(false); setEditingPatient(null); }} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
+                  <FiX size={24} />
+                </button>
+              </div>
+              <PatientForm patient={editingPatient} isEdit={!!editingPatient} onSubmit={editingPatient ? handleEditPatient : handleCreatePatient} onClose={() => { setShowCreateModal(false); setEditingPatient(null); }} />
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
 }
 
-// --- 2. MODAL WRAPPER (FOR GLASSUI) ---
-function ModalWrapper({ children, title, onClose }: { children: React.ReactNode, title: string, onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop with heavy blur to hide everything behind[cite: 1] */}
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" onClick={onClose} />
-      
-      {/* Content Card */}
-      <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20 flex flex-col">
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/50 backdrop-blur-md">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight">{title}</h2>
-          <button onClick={onClose} className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition-all">
-            <FiX size={24} />
-          </button>
-        </div>
-        <div className="p-8 overflow-y-auto custom-scrollbar">
-          {children}
-        </div>
-      </div>
-    </div>
-  )
-}
+
 
 // --- 3. REUSABLE FORM COMPONENT (CREATE/EDIT)[cite: 1] ---
 export function PatientForm({ patient, isEdit, onSubmit, onClose }: any) {
@@ -341,7 +337,7 @@ export function PatientForm({ patient, isEdit, onSubmit, onClose }: any) {
         </div>
         <div className="mt-6">
           <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Residential Address</label>
-          <textarea name="address" value={formData.address} onChange={handleChange} rows={2} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-slate-700 resize-none mt-2"></textarea>
+          <textarea name="address" value={formData.address} onChange={handleChange} rows={2} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-slate-700 resize-none mt-2"></textarea>
         </div>
         <div className="grid grid-cols-3 gap-4 mt-6">
           <Input label="City" name="city" value={formData.city} onChange={handleChange} />
@@ -392,7 +388,7 @@ export function PatientForm({ patient, isEdit, onSubmit, onClose }: any) {
 
       <div className="flex gap-4 pt-6">
         <button type="button" onClick={onClose} className="flex-1 py-4 px-6 border-2 border-slate-100 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all uppercase tracking-widest text-xs">Discard</button>
-        <button type="submit" disabled={loading} className="flex-[2] py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-blue-200 disabled:opacity-50 uppercase tracking-widest text-xs">
+        <button type="submit" disabled={loading} className="flex-[2] py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-indigo-200 disabled:opacity-50 uppercase tracking-widest text-xs">
           {loading ? 'Processing...' : isEdit ? 'Save Changes' : 'Confirm Registration'}
         </button>
       </div>
@@ -403,146 +399,110 @@ export function PatientForm({ patient, isEdit, onSubmit, onClose }: any) {
 // --- 4. VIEW COMPONENT[cite: 1] ---
 function PatientView({ patient, onEdit }: any) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-6">
-        <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-[2rem] flex items-center justify-center font-black text-3xl border-2 border-white shadow-inner">
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center font-black text-2xl">
           {patient.name.split(' ').map((n: string) => n[0]).join('')}
         </div>
         <div>
-          <h3 className="text-2xl font-black text-slate-900 leading-none">{patient.name}</h3>
-          <p className="text-blue-600 font-mono font-bold mt-2 text-sm tracking-tighter bg-blue-50 inline-block px-2 py-0.5 rounded-lg border border-blue-100">
-            ID: {patient.mrn}
-          </p>
-          <p className="text-slate-500 text-xs mt-1">Status: <span className="font-bold text-slate-700">{patient.status}</span></p>
+          <h3 className="text-xl font-black text-slate-900 leading-none">{patient.name}</h3>
+          <p className="text-indigo-600 font-mono text-xs font-bold mt-1">MRN: {patient.mrn}</p>
+          <p className="text-slate-500 text-xs mt-1">{patient.status}</p>
         </div>
       </div>
 
       {/* Demographics */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Demographics</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <DetailCard icon={<FiCalendar />} label="Birthday" value={patient.dob} />
-          <DetailCard icon={<FiActivity />} label="Blood Type" value={patient.bloodType || 'Unknown'} />
-          <DetailCard label="Gender" value={patient.gender} />
-          <DetailCard label="Occupation" value={patient.occupation || 'N/A'} />
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Date of Birth</p>
+          <p className="font-bold text-slate-700">{patient.dob}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Gender</p>
+          <p className="font-bold text-slate-700">{patient.gender}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Blood Type</p>
+          <p className="font-bold text-slate-700">{patient.bloodType || 'Not specified'}</p>
         </div>
       </div>
 
       {/* Contact Information */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Contact Information</h3>
-        <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-3">
-          <div className="flex items-center gap-3">
-            <FiPhone className="text-blue-500" />
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone</p>
-              <p className="font-bold text-slate-700">{patient.phone}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <FiMail className="text-blue-500" />
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</p>
-              <p className="font-bold text-slate-700">{patient.email || 'Not provided'}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <FiMapPin className="text-blue-500" />
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Address</p>
-              <p className="font-bold text-slate-700">{patient.address}, {patient.city}, {patient.state} {patient.zipCode}</p>
-            </div>
-          </div>
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Phone</p>
+          <p className="font-bold text-slate-700">{patient.phone}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Email</p>
+          <p className="font-bold text-slate-700">{patient.email || 'Not provided'}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Address</p>
+          <p className="font-bold text-slate-700 text-sm">{patient.address}, {patient.city}, {patient.state} {patient.zipCode}</p>
         </div>
       </div>
 
       {/* Insurance */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Insurance Coverage</h3>
-        <div className="space-y-4">
-          {patient.primaryInsuranceName && (
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-2xl border border-blue-200">
-              <p className="text-xs font-black text-blue-600 uppercase tracking-widest mb-2">Primary Insurance</p>
-              <p className="font-bold text-slate-900 text-sm">{patient.primaryInsuranceName}</p>
-              <p className="text-xs text-slate-600 font-mono mt-1">Policy: {patient.primaryPolicyNumber}</p>
-            </div>
-          )}
+      {patient.primaryInsuranceName && (
+        <div className="space-y-3">
+          <div>
+            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Primary Insurance</p>
+            <p className="font-bold text-slate-700">{patient.primaryInsuranceName}</p>
+            <p className="text-xs text-slate-500 font-mono mt-1">Policy: {patient.primaryPolicyNumber}</p>
+          </div>
           {patient.secondaryInsuranceName && (
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-5 rounded-2xl border border-slate-200">
-              <p className="text-xs font-black text-slate-600 uppercase tracking-widest mb-2">Secondary Insurance</p>
-              <p className="font-bold text-slate-900 text-sm">{patient.secondaryInsuranceName}</p>
-              <p className="text-xs text-slate-600 font-mono mt-1">Policy: {patient.secondaryPolicyNumber}</p>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Secondary Insurance</p>
+              <p className="font-bold text-slate-700">{patient.secondaryInsuranceName}</p>
+              <p className="text-xs text-slate-500 font-mono mt-1">Policy: {patient.secondaryPolicyNumber}</p>
             </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Medical Information */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Medical History</h3>
-        <div className="space-y-3">
-          {patient.medicalHistory && patient.medicalHistory.length > 0 ? (
-            patient.medicalHistory.map((item: string, idx: number) => (
-              <div key={idx} className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100">
-                <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-                <span className="font-semibold text-slate-700 text-sm">{item}</span>
-              </div>
-            ))
-          ) : (
-            <p className="text-slate-500 text-sm">No medical history recorded</p>
-          )}
+      {patient.medicalHistory && patient.medicalHistory.length > 0 && (
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Medical History</p>
+          <div className="space-y-2">
+            {patient.medicalHistory.map((item: string, idx: number) => (
+              <div key={idx} className="text-sm font-semibold text-slate-700">• {item}</div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Allergies */}
-      <div>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Known Allergies</h3>
-        <div className="flex flex-wrap gap-2">
-          {patient.allergies && patient.allergies.length > 0 ? (
-            patient.allergies.map((allergy: string, idx: number) => (
-              <span key={idx} className="bg-red-50 text-red-700 text-xs font-bold px-3 py-1.5 rounded-full border border-red-100">
-                {allergy}
-              </span>
-            ))
-          ) : (
-            <span className="text-slate-500 text-sm">No allergies recorded</span>
-          )}
+      {patient.allergies && patient.allergies.length > 0 && (
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Known Allergies</p>
+          <div className="text-sm text-slate-700">
+            {patient.allergies.join(', ')}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Provider */}
       {patient.primaryProviderName && (
-        <div>
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Primary Care Provider</h3>
-          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-            <p className="font-bold text-slate-900">{patient.primaryProviderName}</p>
-            {patient.primaryProviderId && (
-              <p className="text-xs text-slate-600 font-mono mt-1">ID: {patient.primaryProviderId}</p>
-            )}
-          </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Primary Care Provider</p>
+          <p className="font-bold text-slate-700">{patient.primaryProviderName}</p>
         </div>
       )}
 
       {/* Emergency Contact */}
       {patient.emergencyContact && (
-        <div>
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Emergency Contact</h3>
-          <div className="bg-red-50 p-5 rounded-2xl border border-red-100">
-            <p className="font-bold text-slate-900">{patient.emergencyContact}</p>
-            <div className="flex items-center gap-2 mt-2">
-              <FiPhone size={14} className="text-red-600" />
-              <p className="text-sm font-semibold text-slate-700">{patient.emergencyPhone}</p>
-            </div>
-            {patient.emergencyRelationship && (
-              <p className="text-xs text-slate-600 mt-2">Relationship: <span className="font-bold">{patient.emergencyRelationship}</span></p>
-            )}
-          </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Emergency Contact</p>
+          <p className="font-bold text-slate-700">{patient.emergencyContact}</p>
+          <p className="text-xs text-slate-600 mt-1">{patient.emergencyPhone}</p>
         </div>
       )}
 
-      <button onClick={onEdit} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all">
-        Edit Case Information
+      <button onClick={onEdit} className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-indigo-700 transition-all mt-4">
+        Edit Information
       </button>
     </div>
   )
@@ -557,7 +517,7 @@ function Input({ label, icon, ...props }: any) {
       </label>
       <input 
         {...props} 
-        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300" 
+        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300" 
       />
     </div>
   )
@@ -565,9 +525,9 @@ function Input({ label, icon, ...props }: any) {
 
 function DetailCard({ icon, label, value }: any) {
   return (
-    <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-blue-500">{icon}</span>
+    <div className="space-y-1">
+      <div className="flex items-center gap-2">
+        <span className="text-indigo-500">{icon}</span>
         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
       </div>
       <p className="font-bold text-slate-800 text-sm">{value}</p>
@@ -583,7 +543,7 @@ function SelectInput({ label, name, value, onChange, options }: any) {
         name={name}
         value={value} 
         onChange={onChange} 
-        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-bold text-slate-700 transition-all"
+        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none font-bold text-slate-700 transition-all"
       >
         {options.map((opt: string) => (
           <option key={opt} value={opt}>{opt}</option>
@@ -623,7 +583,7 @@ export function PatientDetail({ patientId }: { patientId: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-10 h-10 border-[3px] border-blue-100 border-t-blue-600 rounded-full"></div>
+        <div className="animate-spin w-10 h-10 border-[3px] border-indigo-100 border-t-indigo-600 rounded-full"></div>
       </div>
     )
   }
