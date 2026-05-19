@@ -162,7 +162,7 @@ export const OpportunitiesTable = () => {
         </div>
         <button 
           onClick={() => { setCurrentOpp(emptyOpp); setModalMode('create'); setIsModalOpen(true); }}
-          className="flex items-center gap-2 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg active:scale-95 hover:brightness-110"
+          className="flex items-center gap-2 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 hover:brightness-110"
           style={{ backgroundColor: PRIMARY_COLOR }}
         >
           <FiPlus size={20} /> New Deal
@@ -184,7 +184,11 @@ export const OpportunitiesTable = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                <tr><td colSpan={5} className="p-20 text-center font-bold text-slate-300 uppercase">Syncing...</td></tr>
+                <tr>
+                  <td colSpan={5} className="p-20 text-center font-bold text-slate-300 uppercase tracking-widest">
+                    Syncing...
+                  </td>
+                </tr>
               ) : opps.map((opp) => (
                 <tr key={opp._id} className="hover:bg-blue-50/20 group transition-colors">
                   <td className="px-8 py-6">
@@ -205,15 +209,15 @@ export const OpportunitiesTable = () => {
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-3">
-                      <img src={getAvatar(opp.assignedUserName)} className="w-8 h-8 rounded-xl" />
+                      <img src={getAvatar(opp.assignedUserName)} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
                       <span className="text-sm font-bold text-slate-600">{opp.assignedUserName}</span>
                     </div>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => { setCurrentOpp(opp); setViewCardOpen(true); }} className="p-2 text-slate-400 hover:text-blue-500"><FiEye size={18}/></button>
-                      <button onClick={() => { setCurrentOpp(opp); setModalMode('edit'); setIsModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-500"><FiEdit2 size={16}/></button>
-                      <button onClick={() => handleDelete(opp._id)} disabled={deleting === opp._id} className="p-2 text-slate-400 hover:text-rose-500"><FiTrash2 size={18}/></button>
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                      <button onClick={() => { setCurrentOpp(opp); setViewCardOpen(true); }} className="p-2 text-slate-400 hover:text-blue-500 transition-colors"><FiEye size={18}/></button>
+                      <button onClick={() => { setCurrentOpp(opp); setModalMode('edit'); setIsModalOpen(true); }} className="p-2 text-slate-400 hover:text-amber-500 transition-colors"><FiEdit2 size={16}/></button>
+                      <button onClick={() => handleDelete(opp._id)} disabled={deleting === opp._id} className="p-2 text-slate-400 hover:text-rose-500 transition-colors"><FiTrash2 size={18}/></button>
                     </div>
                   </td>
                 </tr>
@@ -227,43 +231,43 @@ export const OpportunitiesTable = () => {
       {isModalOpen && (
         <>
           <div
-            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            className="fixed inset-0 z-[998] bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300"
             onClick={() => setIsModalOpen(false)}
           />
-          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto border-l border-slate-100">
             <div className="p-8 space-y-6">
               <div className="flex justify-between items-center pb-4 border-b border-slate-100">
-                <h2 className="text-2xl font-black text-slate-800 uppercase">
+                <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">
                   {modalMode} Opportunity
                 </h2>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-all"
                 >
-                  <FiX size={24} />
+                  <FiX size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Title
                   </label>
                   <input
                     required
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.title}
                     onChange={(e) => setCurrentOpp({ ...currentOpp, title: e.target.value })}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Contact *
                   </label>
                   <select
                     required
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.contactId || ''}
                     onChange={(e) => {
                       setCurrentOpp({ ...currentOpp, contactId: e.target.value });
@@ -281,19 +285,19 @@ export const OpportunitiesTable = () => {
                     )}
                   </select>
                   {contacts.length === 0 && (
-                    <p className="text-[10px] text-amber-600 mt-2">
+                    <p className="text-[10px] font-bold text-amber-600 mt-1 ml-1 flex items-center gap-1">
                       ⚠️ No contacts loaded
                     </p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Owner
                   </label>
                   <select
                     required
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.owner_id}
                     onChange={(e) => setCurrentOpp({ ...currentOpp, owner_id: e.target.value })}
                   >
@@ -306,50 +310,50 @@ export const OpportunitiesTable = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Amount ($)
                   </label>
                   <input
                     type="number"
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.amount}
                     onChange={(e) => setCurrentOpp({ ...currentOpp, amount: Number(e.target.value) })}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Probability (%)
                   </label>
                   <input
                     type="number"
                     min="0"
                     max="100"
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.probability}
                     onChange={(e) => setCurrentOpp({ ...currentOpp, probability: Number(e.target.value) })}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Close Date
                   </label>
                   <input
                     type="date"
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.close_date}
                     onChange={(e) => setCurrentOpp({ ...currentOpp, close_date: e.target.value })}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
                     Stage
                   </label>
                   <select
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold mt-2"
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-[#21a9ff]/10 focus:border-[#21a9ff] outline-none transition-all font-medium"
                     value={currentOpp.stage}
                     onChange={(e) => setCurrentOpp({ ...currentOpp, stage: e.target.value })}
                   >
@@ -363,7 +367,7 @@ export const OpportunitiesTable = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-4 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white rounded-2xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95"
+                  className="w-full py-4 mt-2 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white rounded-2xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95"
                 >
                   Save Opportunity
                 </button>
@@ -377,41 +381,41 @@ export const OpportunitiesTable = () => {
       {viewCardOpen && (
         <>
           <div
-            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            className="fixed inset-0 z-[998] bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300"
             onClick={() => setViewCardOpen(false)}
           />
-          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto border-l border-slate-100">
             <div className="p-8 space-y-6">
               <div className="flex justify-between items-center pb-4 border-b border-slate-100">
-                <h2 className="text-2xl font-black text-slate-800 uppercase flex items-center gap-2">
-                  <FiEye className="text-blue-500" /> Deal Overview
+                <h2 className="text-xl font-black text-slate-800 uppercase flex items-center gap-2 tracking-tight">
+                  <FiEye className="text-[#21a9ff]" /> Deal Overview
                 </h2>
                 <button
                   onClick={() => setViewCardOpen(false)}
-                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
+                  className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-all"
                 >
-                  <FiX size={24} />
+                  <FiX size={20} />
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase">Title</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Title</p>
                   <p className="font-bold text-slate-700 text-lg">{currentOpp.title}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase">Value</p>
-                  <p className="font-black text-emerald-600 text-lg">${Number(currentOpp.amount).toLocaleString()}</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Value</p>
+                  <p className="font-black text-emerald-600 text-xl">${Number(currentOpp.amount).toLocaleString()}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase">Contact</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Contact</p>
                   <p className="font-bold text-slate-700">{currentOpp.companyName}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase">Assigned To</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Assigned To</p>
                   <p className="font-bold text-slate-700">{currentOpp.assignedUserName}</p>
                 </div>
 
@@ -422,13 +426,13 @@ export const OpportunitiesTable = () => {
                     {currentOpp.stage?.replace('_', ' ')}
                   </span>
                   <p className="text-sm font-bold text-slate-500 flex items-center gap-2">
-                    <FiCalendar /> Closing: {currentOpp.close_date}
+                    <FiCalendar className="text-slate-400" /> Closing: {currentOpp.close_date}
                   </p>
                 </div>
 
                 <button
                   onClick={() => setViewCardOpen(false)}
-                  className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all"
+                  className="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all mt-4"
                 >
                   Close
                 </button>

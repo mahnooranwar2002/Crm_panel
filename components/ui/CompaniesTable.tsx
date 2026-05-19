@@ -153,7 +153,7 @@ const CompaniesTable = () => {
   }, []);
 
   return (
-    <div className="w-full p-4 md:p-8 bg-[#f8fafc] min-h-screen text-slate-800">
+    <div className="w-full p-4 md:p-8 bg-slate-50 min-h-screen text-slate-800">
       <Toaster position="top-right" />
 
       {/* --- Header Section --- */}
@@ -166,8 +166,7 @@ const CompaniesTable = () => {
         {(canCreate || userRole === '') && (
           <button
             onClick={() => setAddingCompany({ name: '', industry: '', website: '', address: '' })}
-            className="flex items-center justify-center gap-2 text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:scale-105 active:scale-95 transition-all w-full md:w-auto"
-            style={{ backgroundColor: PRIMARY_COLOR }}
+            className="flex items-center justify-center gap-2 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition-all w-full md:w-auto bg-indigo-600"
           >
             <FiPlus size={20} /> Add New Company
           </button>
@@ -182,53 +181,53 @@ const CompaniesTable = () => {
           placeholder="Search companies by name, industry, or website..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-14 pr-6 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:border-[#21a9ff] focus:outline-none transition-all font-medium text-slate-700"
+          className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-all font-medium text-slate-700 text-sm"
         />
       </div>
 
       {/* --- Table Section --- */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-32 gap-3">
-            <FiLoader className="animate-spin" size={32} style={{ color: PRIMARY_COLOR }} />
+            <FiLoader className="animate-spin text-indigo-600" size={32} />
             <p className="text-lg font-bold text-slate-600">Loading companies...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 text-[12px] font-black uppercase tracking-[0.15em] text-slate-400 border-b border-slate-100">
-                  <th className="px-10 py-6">Company Info</th>
-                  <th className="px-10 py-6">Industry</th>
-                  <th className="px-10 py-6">Owner</th>
-                  <th className="px-10 py-6 text-right">Actions</th>
+                <tr className="bg-slate-50/50 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                  <th className="px-6 py-4">Company Info</th>
+                  <th className="px-6 py-4">Industry</th>
+                  <th className="px-6 py-4">Owner</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 text-slate-600">
+              <tbody className="divide-y divide-slate-100 text-slate-600">
                 {companies.length > 0 ? (
                   companies.map((company) => (
-                    <tr key={company._id} className="hover:bg-blue-50/30 transition-colors group">
-                      <td className="px-10 py-6">
+                    <tr key={company._id} className="hover:bg-slate-50 transition-colors group">
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="p-3 bg-slate-100 rounded-xl group-hover:bg-white transition-colors" style={{ color: PRIMARY_COLOR }}>
-                            <FiBriefcase size={20} />
+                          <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100/50">
+                            <FiBriefcase size={18} />
                           </div>
                           <div>
-                            <p className="font-extrabold text-slate-800 text-lg">{company.name}</p>
+                            <p className="font-bold text-slate-900 text-base">{company.name}</p>
                             <p className="text-sm text-slate-400 font-medium">
                               {company.website || 'No website'}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-10 py-6">
-                        <span className="px-4 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-black uppercase tracking-wider">
+                      <td className="px-6 py-4">
+                        <span className="px-2.5 py-1 bg-slate-50 text-slate-600 rounded-lg text-xs font-bold uppercase border border-slate-200/60 tracking-wide">
                           {company.industry}
                         </span>
                       </td>
-                      <td className="px-10 py-6">
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-[#6dc6fe]/20 flex items-center justify-center text-[#21a9ff] font-bold text-xs uppercase">
+                          <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100/50 flex items-center justify-center font-bold text-xs uppercase">
                             {(company.owner_id?.name || `${company.owner_id?.firstName || ''} ${company.owner_id?.lastName || ''}` || '?').charAt(0)}
                           </div>
                           <p className="text-sm font-bold text-slate-700">
@@ -236,29 +235,29 @@ const CompaniesTable = () => {
                           </p>
                         </div>
                       </td>
-                      <td className="px-10 py-6 text-right">
-                        <div className="flex justify-end gap-3">
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => setSelectedCompany(company)} 
-                            className="p-3 text-slate-400 hover:text-[#21a9ff] hover:bg-white rounded-xl shadow-sm transition-all"
+                            className="p-2 text-slate-400 hover:text-green-600 transition-colors"
                             title="View details"
                           >
-                            <FiEye size={20}/>
+                            <FiEye size={18}/>
                           </button>
                           <button 
                             onClick={() => setEditingCompany(company)} 
-                            className="p-3 text-slate-400 hover:text-amber-500 hover:bg-white rounded-xl shadow-sm transition-all"
+                            className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
                             title="Edit company"
                           >
-                            <FiEdit2 size={20}/>
+                            <FiEdit2 size={18}/>
                           </button>
                           <button 
                             onClick={() => handleDelete(company._id!)} 
                             disabled={deleting === company._id}
-                            className="p-3 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-30"
                             title="Delete company"
                           >
-                            {deleting === company._id ? <FiLoader className="animate-spin" size={20} /> : <FiTrash2 size={20}/>}
+                            {deleting === company._id ? <FiLoader className="animate-spin" size={18} /> : <FiTrash2 size={18}/>}
                           </button>
                         </div>
                       </td>
@@ -266,11 +265,11 @@ const CompaniesTable = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-10 py-32 text-center">
+                    <td colSpan={4} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center opacity-40">
-                        <FiBriefcase size={60} className="mb-4" />
-                        <p className="text-xl font-bold">No companies found</p>
-                        <p className="text-sm">Try adding a new company or changing your search.</p>
+                        <FiBriefcase size={48} className="mb-2 text-indigo-600" />
+                        <p className="font-medium">No companies found</p>
+                        <p className="text-xs text-slate-400 mt-1">Try adding a new company or changing your search.</p>
                       </div>
                     </td>
                   </tr>
@@ -303,66 +302,58 @@ const CompaniesTable = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
-                    Company Name
-                  </p>
-                  <p className="text-xl font-black text-slate-900">
-                    {selectedCompany.name}
-                  </p>
+                <div className="p-5 bg-indigo-50 rounded-2xl border border-indigo-100/50 flex items-center gap-4">
+                  <div className="p-3 bg-indigo-600 text-white rounded-xl shadow-md">
+                    <FiBriefcase size={22} />
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-indigo-950">{selectedCompany.name}</p>
+                    <p className="text-[10px] font-black text-indigo-600 uppercase tracking-wider mt-0.5">{selectedCompany.industry}</p>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
-                      Industry
-                    </p>
-                    <p className="text-lg font-bold text-slate-700">
-                      {selectedCompany.industry}
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                       Owner
                     </p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[#6dc6fe]/20 flex items-center justify-center text-[#21a9ff] font-bold text-xs uppercase">
+                    <div className="flex items-center gap-2 pt-1">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 border border-slate-200 flex items-center justify-center font-bold text-xs uppercase">
                         {(selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}` || '?').charAt(0)}
                       </div>
-                      <p className="font-bold text-slate-700">
+                      <p className="font-bold text-slate-700 text-sm">
                         {selectedCompany.owner_id?.name || `${selectedCompany.owner_id?.firstName || ''} ${selectedCompany.owner_id?.lastName || ''}`.trim() || selectedCompany.owner_id?.email || 'Unassigned'}
                       </p>
                     </div>
                   </div>
-                </div>
 
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                    <FiGlobe /> Website
-                  </p>
-                  <a
-                    href={selectedCompany.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-slate-900 font-bold hover:underline"
-                  >
-                    {selectedCompany.website || 'No website'}
-                  </a>
-                </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                      Website
+                    </p>
+                    <a
+                      href={selectedCompany.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 font-bold text-sm hover:underline inline-flex items-center gap-1.5 pt-1"
+                    >
+                      <FiGlobe /> {selectedCompany.website || 'No website'}
+                    </a>
+                  </div>
 
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                    <FiMapPin /> Address
-                  </p>
-                  <p className="text-lg font-bold text-slate-700">
-                    {selectedCompany.address || 'No address provided'}
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                      Address
+                    </p>
+                    <p className="font-bold text-slate-700 text-sm flex items-start gap-1.5 pt-1">
+                      <FiMapPin className="text-slate-400 mt-0.5 shrink-0" /> {selectedCompany.address || 'No address provided'}
+                    </p>
+                  </div>
                 </div>
 
                 <button
                   onClick={() => setSelectedCompany(null)}
-                  className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all"
+                  className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all text-sm mt-4 border border-slate-200/50"
                 >
                   Close
                 </button>
@@ -406,7 +397,7 @@ const CompaniesTable = () => {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
+                    className="w-full px-5 py-3 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 text-sm"
                     value={addingCompany?.name || editingCompany?.name || ''}
                     onChange={(e) =>
                       addingCompany
@@ -423,7 +414,7 @@ const CompaniesTable = () => {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
+                    className="w-full px-5 py-3 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 text-sm"
                     value={addingCompany?.industry || editingCompany?.industry || ''}
                     onChange={(e) =>
                       addingCompany
@@ -442,7 +433,7 @@ const CompaniesTable = () => {
                     <FiGlobe className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      className="w-full pl-12 pr-6 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
+                      className="w-full pl-12 pr-6 py-3 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 text-sm"
                       value={addingCompany?.website || editingCompany?.website || ''}
                       onChange={(e) =>
                         addingCompany
@@ -459,7 +450,7 @@ const CompaniesTable = () => {
                     Assign to Owner
                   </label>
                   <select
-                    className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none appearance-none font-bold"
+                    className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-xl focus:bg-white focus:border-indigo-500 outline-none font-medium text-slate-700 text-sm cursor-pointer"
                     value={addingCompany?.owner_id?._id || editingCompany?.owner_id?._id || ''}
                     onChange={(e) => {
                       const selectedUser = users.find((u) => u._id === e.target.value);
@@ -488,7 +479,7 @@ const CompaniesTable = () => {
                     Address
                   </label>
                   <textarea
-                    className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold resize-none"
+                    className="w-full px-5 py-3 bg-slate-50/50 border border-slate-100 rounded-xl focus:bg-white focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 text-sm resize-none"
                     rows={2}
                     value={addingCompany?.address || editingCompany?.address || ''}
                     onChange={(e) =>
@@ -501,48 +492,46 @@ const CompaniesTable = () => {
                 </div>
 
                 <button
-                  onClick={
-                    addingCompany
-                      ? async () => {
-                          if (!addingCompany.name || !addingCompany.industry) {
-                            toast.error('Please fill in all required fields');
-                            return;
-                          }
-                          const loadToast = toast.loading('Creating...');
-                          try {
-                            await CompanyService.createCompany({
-                              ...addingCompany,
-                              owner_id: addingCompany.owner_id?._id,
-                            });
-                            toast.success('Success!', { id: loadToast });
-                            setAddingCompany(null);
-                            setSearchTerm('');
-                            await fetchCompanies('');
-                          } catch (e: any) {
-                            toast.error(e.message, { id: loadToast });
-                          }
+                  onClick={addingCompany ? async () => {
+                        if (!addingCompany.name || !addingCompany.industry) {
+                          toast.error('Please fill in all required fields');
+                          return;
                         }
-                      : async () => {
-                          if (!editingCompany?.name || !editingCompany?.industry) {
-                            toast.error('Please fill in all required fields');
-                            return;
-                          }
-                          const loadToast = toast.loading('Updating...');
-                          try {
-                            await CompanyService.updateCompany(editingCompany!._id!, {
-                              ...editingCompany,
-                              owner_id: editingCompany?.owner_id?._id,
-                            });
-                            toast.success('Updated!', { id: loadToast });
-                            setEditingCompany(null);
-                            setSearchTerm('');
-                            await fetchCompanies('');
-                          } catch (e: any) {
-                            toast.error(e.message, { id: loadToast });
-                          }
+                        const loadToast = toast.loading('Creating...');
+                        try {
+                          await CompanyService.createCompany({
+                            ...addingCompany,
+                            owner_id: addingCompany.owner_id?._id,
+                          });
+                          toast.success('Success!', { id: loadToast });
+                          setAddingCompany(null);
+                          setSearchTerm('');
+                          await fetchCompanies('');
+                        } catch (e: any) {
+                          toast.error(e.message, { id: loadToast });
                         }
+                      }
+                    : async () => {
+                        if (!editingCompany?.name || !editingCompany?.industry) {
+                          toast.error('Please fill in all required fields');
+                          return;
+                        }
+                        const loadToast = toast.loading('Updating...');
+                        try {
+                          await CompanyService.updateCompany(editingCompany!._id!, {
+                            ...editingCompany,
+                            owner_id: editingCompany?.owner_id?._id,
+                          });
+                          toast.success('Updated!', { id: loadToast });
+                          setEditingCompany(null);
+                          setSearchTerm('');
+                          await fetchCompanies('');
+                        } catch (e: any) {
+                          toast.error(e.message, { id: loadToast });
+                        }
+                      }
                   }
-                  className="w-full py-4 bg-[#21a9ff] hover:bg-[#6dc6fe] text-white rounded-2xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95"
+                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-100 text-sm mt-4"
                 >
                   Save Company Info
                 </button>
