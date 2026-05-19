@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { FiPlus, FiEdit2, FiTrash2, FiCheckCircle, FiZap, FiSearch, FiFilter, FiX, FiEye, FiClock, FiCreditCard } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiCheckCircle, FiZap, FiSearch, FiFilter, FiX, FiEye, FiClock, FiCreditCard, FiFile } from 'react-icons/fi'
 import { PaymentsService, type Payment } from '@/src/services/financial/PaymentsService'
 
 const PaymentsTable = () => {
@@ -32,7 +32,7 @@ const PaymentsTable = () => {
     recorded_by: 'Finance Team',
   }
 
-  // --- Logic Hooks (Same as before) ---
+  // --- Logic Hooks ---
   useEffect(() => { loadPayments() }, [])
 
   const loadPayments = async () => {
@@ -88,13 +88,17 @@ const PaymentsTable = () => {
     try { await PaymentsService.reconcilePayment(id); loadPayments(); } catch (error) { console.error(error) }
   }
 
-  // --- UI Helpers ---
+  // --- UI Helpers matching ClaimsTable style ---
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Confirmed': return 'bg-emerald-100 text-emerald-700'
-      case 'Pending': return 'bg-amber-100 text-amber-700'
-      case 'Reconciled': return 'bg-violet-100 text-violet-700'
-      default: return 'bg-slate-100 text-slate-700'
+      case 'Pending':
+        return 'bg-amber-50 text-amber-600 border-amber-100'
+      case 'Confirmed':
+        return 'bg-emerald-50 text-emerald-600 border-emerald-100'
+      case 'Reconciled':
+        return 'bg-purple-50 text-purple-600 border-purple-100'
+      default:
+        return 'bg-slate-50 text-slate-600 border-slate-100'
     }
   }
 
@@ -106,110 +110,144 @@ const PaymentsTable = () => {
   })
 
   return (
-    <div className="p-8 max-w-7xl mx-auto text-slate-900 font-sans antialiased">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight">Payments Journal</h1>
-          <p className="text-slate-500 font-medium mt-1">Manage and reconcile inbound transactions</p>
-        </div>
-        <button
-          onClick={handleAddNew}
-          className="bg-[#21a9ff] text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-blue-200 hover:shadow-blue-300 hover:-translate-y-0.5 active:translate-y-0 transition-all"
-        >
-          <FiPlus size={20} /> New Payment
-        </button>
-      </div>
-
-      {/* Control Bar */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="relative flex-1 group">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-          <input
-            type="text"
-            placeholder="Search invoice or reference ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-[1.25rem] shadow-sm focus:ring-4 focus:ring-blue-500/5 focus:border-blue-400 outline-none transition-all"
-          />
-        </div>
-        <div className="relative min-w-[200px]">
-          <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full pl-12 pr-10 py-4 bg-white border border-slate-200 rounded-[1.25rem] shadow-sm focus:ring-4 focus:ring-blue-500/5 outline-none appearance-none font-bold text-slate-600 cursor-pointer"
+    <div className="w-full bg-slate-50 min-h-screen p-6 text-black">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Block matched with ClaimsTable style */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Payments Journal</h1>
+            <p className="text-slate-500 font-medium">Manage and reconcile inbound transactions</p>
+          </div>
+          <button
+            onClick={handleAddNew}
+            className="bg-[#21a9ff] text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all font-bold"
           >
-            <option>All</option>
-            <option>Pending</option>
-            <option>Confirmed</option>
-            <option>Reconciled</option>
-          </select>
+            <FiPlus size={20} /> New Payment
+          </button>
         </div>
-      </div>
 
-      {/* Table Section */}
-      <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-400">Invoice Info</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-400">Amount</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-400">Status</th>
-                <th className="px-8 py-5 text-right text-xs font-black uppercase tracking-widest text-slate-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {loading ? (
-                <tr><td colSpan={4} className="px-8 py-20 text-center font-bold text-slate-400 animate-pulse">Syncing transactions...</td></tr>
-              ) : filteredPayments.length === 0 ? (
-                <tr><td colSpan={4} className="px-8 py-20 text-center font-bold text-slate-400">No payment records found.</td></tr>
-              ) : (
-                filteredPayments.map((payment) => (
-                  <tr key={payment._id} className="group hover:bg-slate-50/80 transition-colors">
-                    <td className="px-8 py-5">
-                      <p className="font-bold text-slate-800 text-lg">{payment.invoice_id}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-tighter bg-blue-50 px-2 py-0.5 rounded-md">
-                          {payment.payment_method.replace('_', ' ')}
-                        </span>
-                        <span className="text-xs text-slate-400 font-medium">
-                          {new Date(payment.payment_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex flex-col">
-                        <span className="text-xl font-black text-slate-900">${payment.amount_received.toFixed(2)}</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">{payment.reference_number || 'No Ref'}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <span className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider ${getStatusColor(payment.status)}`}>
-                        {payment.status}
-                      </span>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => setViewingPayment(payment)} className="p-3 text-slate-400 hover:text-blue-500 hover:bg-white hover:shadow-md rounded-xl transition-all"><FiEye size={18} /></button>
-                        <button onClick={() => handleEdit(payment)} className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white hover:shadow-md rounded-xl transition-all"><FiEdit2 size={18} /></button>
-                        
-                        {payment.status === 'Pending' && (
-                          <button onClick={() => handleConfirm(payment._id || '')} className="p-3 text-slate-400 hover:text-emerald-500 hover:bg-white hover:shadow-md rounded-xl transition-all"><FiCheckCircle size={18} /></button>
-                        )}
-                        {payment.status === 'Confirmed' && (
-                          <button onClick={() => handleReconcile(payment._id || '')} className="p-3 text-slate-400 hover:text-violet-500 hover:bg-white hover:shadow-md rounded-xl transition-all"><FiZap size={18} /></button>
-                        )}
-                        
-                        <button onClick={() => handleDelete(payment._id || '')} className="p-3 text-slate-400 hover:text-red-500 hover:bg-white hover:shadow-md rounded-xl transition-all"><FiTrash2 size={18} /></button>
+        {/* Control Filters Bar */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="relative flex-1">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search invoice or reference ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm font-medium"
+            />
+          </div>
+          <div className="relative">
+            <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none font-bold text-slate-600 text-sm cursor-pointer"
+            >
+              <option>All</option>
+              <option>Pending</option>
+              <option>Confirmed</option>
+              <option>Reconciled</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Table Wrapper matched with ClaimsTable style */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Invoice Info</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Method</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center opacity-40 animate-pulse">
+                        <p className="font-bold text-slate-500">Syncing transactions...</p>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : filteredPayments.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center opacity-40">
+                        <FiFile size={48} className="mb-2" />
+                        <p className="font-medium text-slate-500">No payment records found</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredPayments.map((payment) => (
+                    <tr key={payment._id} className="hover:bg-slate-50 transition-colors group">
+                      <td className="px-6 py-4 font-mono text-sm text-slate-600">
+                        <div>
+                          <p className="font-bold text-slate-900 font-sans">#{payment.invoice_id}</p>
+                          <p className="text-xs text-slate-400 font-normal mt-0.5">Ref: {payment.reference_number || 'N/A'}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-bold text-slate-900">
+                        ${payment.amount_received.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-lg text-[11px] font-bold uppercase border ${getStatusColor(payment.status)}`}>
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 text-sm font-medium">
+                        <span className="bg-slate-100 px-2 py-0.5 rounded-md text-xs font-bold text-slate-500 uppercase tracking-tight">
+                          {payment.payment_method.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-500 text-sm font-medium">
+                        {new Date(payment.payment_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-right space-x-3 whitespace-nowrap">
+                        <button
+                          onClick={() => setViewingPayment(payment)}
+                          className="text-slate-400 hover:text-green-600 transition-colors"
+                          title="View Detail"
+                        >
+                          <FiEye size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(payment)}
+                          className="text-slate-400 hover:text-blue-600 transition-colors"
+                          title="Edit"
+                        >
+                          <FiEdit2 size={18} />
+                        </button>
+
+                        {/* Direct workflow actions */}
+                        {payment.status === 'Pending' && (
+                          <button onClick={() => handleConfirm(payment._id || '')} className="text-slate-400 hover:text-emerald-600 transition-colors" title="Confirm"><FiCheckCircle size={18} /></button>
+                        )}
+                        {payment.status === 'Confirmed' && (
+                          <button onClick={() => handleReconcile(payment._id || '')} className="text-slate-400 hover:text-purple-600 transition-colors" title="Reconcile"><FiZap size={18} /></button>
+                        )}
+
+                        <button
+                          onClick={() => handleDelete(payment._id || '')}
+                          className="text-slate-400 hover:text-red-600 transition-colors"
+                          title="Delete"
+                        >
+                          <FiTrash2 size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -225,7 +263,6 @@ const PaymentsTable = () => {
               <div className="flex justify-between items-center pb-4 border-b border-slate-100">
                 <h2 className="text-2xl font-black text-slate-800">Payment Details</h2>
                 <button
-                  type="button"
                   onClick={() => setViewingPayment(null)}
                   className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
                 >
@@ -234,34 +271,31 @@ const PaymentsTable = () => {
               </div>
 
               <div className="space-y-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getStatusColor(viewingPayment.status)}`}
-                >
-                  {viewingPayment.status}
-                </span>
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                  <label className="block text-[10px] font-bold text-blue-600 uppercase mb-1">Amount Received</label>
+                  <p className="text-2xl font-black text-blue-900">${viewingPayment.amount_received.toFixed(2)}</p>
+                </div>
 
-                <h3 className="text-2xl font-black text-slate-900">
-                  Invoice {viewingPayment.invoice_id}
-                </h3>
-                <p className="text-slate-500 font-medium">
-                  Recorded by {viewingPayment.recorded_by}
-                </p>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Invoice Reference</label>
+                  <p className="font-bold text-slate-700">#{viewingPayment.invoice_id}</p>
+                </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">
-                      Amount Received
-                    </p>
-                    <p className="text-2xl font-black text-blue-600">
-                      ${viewingPayment.amount_received.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col justify-center">
-                    <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Method</p>
-                    <p className="text-lg font-black text-slate-700">
-                      {viewingPayment.payment_method.replace('_', ' ')}
-                    </p>
-                  </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</label>
+                  <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase inline-block border ${getStatusColor(viewingPayment.status)}`}>
+                    {viewingPayment.status}
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Method</label>
+                  <p className="font-bold text-slate-700">{viewingPayment.payment_method.replace('_', ' ')}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recorded By</label>
+                  <p className="font-bold text-slate-700">{viewingPayment.recorded_by}</p>
                 </div>
 
                 <div className="space-y-3 border-t border-slate-100 pt-4">
@@ -269,7 +303,7 @@ const PaymentsTable = () => {
                     <span className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
                       <FiClock /> Transaction Date
                     </span>
-                    <span className="font-black text-slate-700">
+                    <span className="font-black text-slate-700 text-sm">
                       {new Date(viewingPayment.payment_date).toLocaleDateString()}
                     </span>
                   </div>
@@ -278,49 +312,34 @@ const PaymentsTable = () => {
                     <span className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
                       <FiCreditCard /> Reference No.
                     </span>
-                    <span className="font-black text-slate-700">
+                    <span className="font-black text-slate-700 text-sm">
                       {viewingPayment.reference_number || 'N/A'}
                     </span>
                   </div>
-
-                  {viewingPayment.bank_account && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                        Bank Account
-                      </span>
-                      <span className="font-black text-slate-700">
-                        {viewingPayment.bank_account}
-                      </span>
-                    </div>
-                  )}
-
-                  {viewingPayment.notes && (
-                    <div className="bg-slate-50 p-4 rounded-2xl italic text-sm text-slate-600">
-                      "{viewingPayment.notes}"
-                    </div>
-                  )}
                 </div>
 
-                <button
-                  onClick={() => setViewingPayment(null)}
-                  className="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition-all"
-                >
-                  Close
-                </button>
+                {viewingPayment.notes && (
+                  <div className="space-y-1 pt-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Internal Notes</label>
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 italic text-sm text-slate-600">
+                      "{viewingPayment.notes}"
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </>
       )}
 
-      {/* CREATE/EDIT Sidebar (right drawer) */}
+      {/* CREATE/EDIT SIDEBAR */}
       {showModal && (
         <>
           <div
-            className="fixed inset-0 z-[109] bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[998] bg-slate-900/40 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
-          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[110] animate-in slide-in-from-right duration-300 overflow-y-auto">
+          <div className="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-[999] animate-in slide-in-from-right duration-300 overflow-y-auto">
             <div className="p-8 space-y-6">
               <div className="flex justify-between items-center pb-4 border-b border-slate-100">
                 <h2 className="text-2xl font-black text-slate-800">
@@ -334,86 +353,88 @@ const PaymentsTable = () => {
                 </button>
               </div>
 
-              <div className="space-y-5">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Invoice Reference *</label>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Invoice Reference *</label>
                   <input
                     type="text"
                     value={formData.invoice_id}
                     onChange={(e) => setFormData({ ...formData, invoice_id: e.target.value })}
-                    className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold placeholder:text-slate-300"
-                    placeholder="INV-0000"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    placeholder="e.g. INV-0000"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Amount Received *</label>
-                    <input
-                      type="number"
-                      value={formData.amount_received}
-                      onChange={(e) => setFormData({ ...formData, amount_received: parseFloat(e.target.value) })}
-                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Method</label>
-                    <select
-                      value={formData.payment_method}
-                      onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as any })}
-                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold text-slate-600"
-                    >
-                      <option>Bank_Transfer</option><option>Cheque</option><option>Credit_Card</option><option>Cash</option><option>Wire</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Date</label>
-                    <input
-                      type="date"
-                      value={new Date(formData.payment_date).toISOString().split('T')[0]}
-                      onChange={(e) => setFormData({ ...formData, payment_date: new Date(e.target.value).getTime() })}
-                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Reference No</label>
-                    <input
-                      type="text"
-                      value={formData.reference_number || ''}
-                      onChange={(e) => setFormData({ ...formData, reference_number: e.target.value })}
-                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-bold placeholder:text-slate-300"
-                      placeholder="TXN-XXXX"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Amount Received *</label>
+                  <input
+                    type="number"
+                    value={formData.amount_received || ''}
+                    onChange={(e) => setFormData({ ...formData, amount_received: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    placeholder="0.00"
+                  />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Internal Notes</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Method</label>
+                  <select
+                    value={formData.payment_method}
+                    onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as any })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none font-medium text-slate-600 cursor-pointer text-sm focus:border-blue-500 focus:bg-white transition-all"
+                  >
+                    <option>Bank_Transfer</option><option>Cheque</option><option>Credit_Card</option><option>Cash</option><option>Wire</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Date</label>
+                  <input
+                    type="date"
+                    value={new Date(formData.payment_date).toISOString().split('T')[0]}
+                    onChange={(e) => setFormData({ ...formData, payment_date: new Date(e.target.value).getTime() })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Reference No</label>
+                  <input
+                    type="text"
+                    value={formData.reference_number || ''}
+                    onChange={(e) => setFormData({ ...formData, reference_number: e.target.value })}
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm"
+                    placeholder="TXN-XXXX"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Internal Notes</label>
                   <textarea
                     value={formData.notes || ''}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-4 focus:ring-blue-500/10 outline-none font-medium resize-none"
+                    className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white transition-all outline-none text-slate-700 font-medium text-sm resize-none"
+                    placeholder="Add details..."
                     rows={2}
                   />
                 </div>
-              </div>
 
-              <div className="flex gap-4 mt-10">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="flex-1 py-4 bg-[#21a9ff] text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all"
-                >
-                  Complete Post
-                </button>
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="flex-1 py-3 font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-2xl transition-all shadow-lg shadow-blue-100 active:scale-95"
+                  >
+                    Complete Post
+                  </button>
+                </div>
               </div>
             </div>
           </div>
